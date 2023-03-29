@@ -2,7 +2,7 @@ const express = require('express')
 app = express()
 const Sequelize = require('sequelize') //Sequelize Banco de Dados SQL
 const handlebars = require('express-handlebars')
-
+const path = require('path')
 
 //Configurações
     //Banco de Dados
@@ -21,9 +21,13 @@ const handlebars = require('express-handlebars')
         app.engine('handlebars', handlebars.engine
         ({defaultLayout: 'main',}))
         app.set('view engine', 'handlebars')
-//Rotas
+    // Public
+        app.use(express.static(path.join(__dirname,'public')))
+        
+        
+    //Rotas
     app.get('/', (req,res)=> {
-        res.render('partials/_navbar')
+        res.render('partials/_navbar',{hideNavBar: false})
     })
 
 
