@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "bootstrap": "^5.2.3",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.0.4",
+    "handlebars": "^4.7.7",
+    "mysql2": "^3.2.0",
+    "node-sass": "^8.0.0",
+    "sequelize": "^6.29.3"
+  }
+}
