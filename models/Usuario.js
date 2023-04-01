@@ -1,6 +1,21 @@
-const {Sequelize, sequelize} = require('../app').sequelize
+const {Model, DataTypes } = require ('sequelize')
 
-const Usuario = sequelize.define('usuarios', {
+class Usuario extends Model{
+    static init(sequelize) {
+        super.init({
+            nome: DataTypes.STRING,
+            sobrenome: DataTypes.STRING,
+            email: DataTypes.STRING,
+            senha: DataTypes.STRING,
+            permissao: DataTypes.INTEGER
+        }, {
+            sequelize
+        })
+    }
+}
+module.exports = Usuario
+/*
+const Usuario = db.sequelize.define('usuarios', {
     id:{
         allowNull: false,
         autoIncrement: true,
@@ -37,3 +52,4 @@ Usuario.sync({force: true}).then((line)=>{
 })
 
 module.exports = Usuario
+*/

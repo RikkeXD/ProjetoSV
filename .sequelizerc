@@ -1,0 +1,7 @@
+//Configuração para ao digitar no cosole as migrations ir diretamente para a pastas correta
+const path = require('path')
+
+module.exports = {
+    config: path.resolve(__dirname,'config', 'database.js'), //Onde se econtra as confiugurações do meu banco de dados
+    'migrations-path': path.resolve(__dirname,'database', 'migrations')//Onde as migrations ira ser armazenada, no caso na pasta migrations
+}

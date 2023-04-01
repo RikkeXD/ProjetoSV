@@ -1,13 +1,13 @@
 <h1>Cadastro de usuarios</h1>
 <div class="card">
     <div class="card-body">
-        <form>
+        <form action="/usuarios/cadastro" method="post">
             <div class="row g-3 align-items-center mt-3">
                 <div class="col-auto aling-items-center">
                     <label for="nome" class="col-form-label">Nome</label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" id="nome" class="form-control" aria-labelledby="nome">
+                    <input type="text" name="nome" class="form-control" aria-labelledby="nome">
                 </div>
                 <div class="col-auto">
                     <span id="nome" class="form-text">
@@ -20,7 +20,7 @@
                     <label for="sobrenome" class="col-form-label">Sobrenome</label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" id="sobrenome" class="form-control " aria-labelledby="sobrenome">
+                    <input type="text" name="sobrenome" class="form-control " aria-labelledby="sobrenome">
                 </div>
                 <div class="col-auto">
                     <span id="sobrenome" class="form-text">
