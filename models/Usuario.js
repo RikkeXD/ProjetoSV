@@ -5,9 +5,15 @@ class Usuario extends Model{
         super.init({
             nome: DataTypes.STRING,
             sobrenome: DataTypes.STRING,
+            telefone: DataTypes.STRING,
+            cpf: DataTypes.STRING,
             email: DataTypes.STRING,
-            senha: DataTypes.STRING,
-            permissao: DataTypes.INTEGER
+            endereco: DataTypes.STRING,
+            numero: DataTypes.STRING,
+            cep: DataTypes.STRING,
+            bairro: DataTypes.STRING,
+            complemento: DataTypes.STRING,
+            uf: DataTypes.STRING
         }, {
             sequelize
         })

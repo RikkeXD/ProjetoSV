@@ -1,5 +1,3 @@
-const { TRUE } = require('node-sass');
-
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -25,6 +23,7 @@ module.exports = {
         },
         cpf: {
           allowNull: true,
+          unique: true,
           type: Sequelize.STRING
         },
         email: {
@@ -52,12 +51,21 @@ module.exports = {
         uf:{
           type: Sequelize.STRING,
           allowNull: true
-        }
-        
+        },
+        created_at: {
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        },
+        updated_at: {
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        },
       })
   },
 
-  async down (queryInterface, Sequelize) {
-    
+  down (queryInterface, Sequelize) {
+    return queryInterface.dropTable('clientes')  
   }
 };
