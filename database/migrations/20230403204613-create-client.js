@@ -4,25 +4,25 @@ module.exports = {
  up (queryInterface, Sequelize) {
       return queryInterface.createTable ('clientes', {
         id:{
-          allowNull: null,
+          allowNull: false,
           autoIncrement: true,
           primaryKey: true,
           type: Sequelize.INTEGER
         },
         nome:{
-          allowNull: true,
+          allowNull: false,
           type: Sequelize.STRING
         },
         sobrenome: {
-          allowNull: true,
+          allowNull: false,
           type: Sequelize.STRING
         },
         telefone:{
-          allowNull: true,
+          allowNull: false,
           type: Sequelize.STRING
         },
         cpf: {
-          allowNull: true,
+          allowNull: false,
           unique: true,
           type: Sequelize.STRING
         },
@@ -30,27 +30,27 @@ module.exports = {
           type: Sequelize.STRING
         },
         endereco: {
-          allowNull: true,
+          allowNull: false,
           type: Sequelize.STRING
         },
         numero: {
-          allowNull: true,
+          allowNull: false,
           type: Sequelize.STRING
         },
         cep: {
-          allowNull: true,
+          allowNull: false,
           type: Sequelize.STRING
         },
         bairro: {
           type: Sequelize.STRING,
-          allowNull: true
+          allowNull: false
         },
         complemento:{
           type: Sequelize.STRING
         },
         uf:{
           type: Sequelize.STRING,
-          allowNull: true
+          allowNull: false
         },
         created_at: {
           type: Sequelize.DATE,

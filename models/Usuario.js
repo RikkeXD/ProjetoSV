@@ -5,20 +5,15 @@ class Usuario extends Model{
         super.init({
             nome: DataTypes.STRING,
             sobrenome: DataTypes.STRING,
-            telefone: DataTypes.STRING,
-            cpf: DataTypes.STRING,
             email: DataTypes.STRING,
-            endereco: DataTypes.STRING,
-            numero: DataTypes.STRING,
-            cep: DataTypes.STRING,
-            bairro: DataTypes.STRING,
-            complemento: DataTypes.STRING,
-            uf: DataTypes.STRING
+            senha: DataTypes.STRING,
+            permissao: DataTypes.INTEGER
         }, {
             sequelize
         })
     }
 }
+
 module.exports = Usuario
 /*
 const Usuario = db.sequelize.define('usuarios', {
