@@ -9,6 +9,7 @@ router.get('/cadastro', (req,res) =>{
 router.post('/cadastro', async (req, res)=>{
     var erros = []
     const {nome , sobrenome, telefone, cpf, endereco, numero, bairro, cidade, estado, cep, complemento, email} = req.body
+
     //Validação de dados
 
     if(!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null){
@@ -48,6 +49,7 @@ router.post('/cadastro', async (req, res)=>{
             nome: req.body.nome,
             sobrenome: req.body.sobrenome,
             telefone: req.body.telefone,
+            email: req.body.email,
             cpf: req.body.cpf,
             endereco: req.body.endereco,
             numero: req.body.numero,
@@ -64,5 +66,7 @@ router.post('/cadastro', async (req, res)=>{
         })
     }
 })
-
+router.get('/', (req,res)=>{
+    res.render('clientes/clientes')
+})
 module.exports = router
