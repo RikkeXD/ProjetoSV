@@ -66,7 +66,17 @@ router.post('/cadastro', async (req, res)=>{
         })
     }
 })
-router.get('/', (req,res)=>{
-    res.render('clientes/clientes')
+router.get('/', async(req,res)=>{
+    const cliente = await Cliente.findAll({})
+    .then((clientes) => {
+            const clientesJSON = clientes.map(cliente => cliente.toJSON());
+            res.render('clientes/clientes', {clientes: clientesJSON})
+            console.log(clientesJSON)
+    })
+    .catch((err)=>{
+        req.flash('error_msg','Erro ao listar as clientes')
+        res.redirect('/home')
+    })
+
 })
 module.exports = router
