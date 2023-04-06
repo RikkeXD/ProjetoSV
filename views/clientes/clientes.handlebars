@@ -7,6 +7,7 @@
       <th scope="col">NOME</th>
       <th scope="col">TELEFONE</th>
       <th scope="col">E-MAIL</th>
+      <th scope="col" class="d-flex justify-content-center">AÇÕES</th>
     </tr>
   </thead>
   
@@ -17,7 +18,97 @@
       <td>{{nome}} {{sobrenome}}</td>
       <td>{{telefone}}</td>
       <td>{{email}}</td>
+      <td>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#ModalVisualizar">Visualizar</button>
+          <button class="btn btn-warning btn-sm" type="button">Editar</button>
+          <button class="btn btn-danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#ModalExluir" data-cliente="{{nome}} {{sobrenome}}">Excluir</button>
+        </div>
+      </td>
     </tr>
+
+    <!--   Modal  Excluir    -->
+    <div class="modal fade" id="ModalExluir" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmar Exclusão</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+          <div class="modal-body">
+            Deseje realmente exluir?
+        </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Visualizar -->
+    <div class="modal fade" id="ModalVisualizar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+
+              <div class="row">
+                  <div class="col-md-4">
+                      <label for="recipient-name" class="col-form-label">Nome:</label>
+                      <input type="text" class="form-control" id="recipient-name">
+                  </div>
+
+                  <div class="col-md-6">
+                      <label for="message-text" class="col-form-label">Sobrenome</label>
+                      <input type="text" class="form-control" id="recipient-name">
+                  </div>
+
+                    <div class="col-md-6">
+                      <label for="message-text" class="col-form-label">Telefone</label>
+                      <input type="text" class="form-control" id="recipient-name">
+                  </div>
+              </div>
+
+              <div class="row">
+                  <div class="col-md-8">
+                    <label for="message-text" class="col-form-label">CPF</label>
+                    <input type="text" class="form-control" id="recipient-name">
+                  </div>
+              </div>
+
+              <div class="row">
+                  <div class="col-md-6">
+                    <label for="message-text" class="col-form-label">E-Mail</label>
+                    <input type="text" class="form-control" id="recipient-name">
+                  </div>
+              </div>
+
+              <div class="row">
+                    <div class="col-md-6">
+                      <label for="message-text" class="col-form-label">Endereço</label>
+                      <input type="text" class="form-control" id="recipient-name">
+                  </div>
+                  <div class="col-md-2">
+                    <label for="message-text" class="col-form-label">Numero</label>
+                    <input type="text" class="form-control" id="recipient-name">
+                  </div>
+              </div>
+              </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Send message</button>
+      </div>
+    </div>
+  </div>
+</div>
     {{else}}
     {{/each}}
   </tbody>
@@ -25,3 +116,15 @@
 {{else}}
   <div class="text-bg-secondary p-3"><h1 class="fs-5">Não existe clientes cadastradas</h1></div>
 {{/if}}
+
+<script>
+  //Informando o nome do cliente cadastrado
+  document.querySelector('#ModalExluir').addEventListener('show.bs.modal', function(event){
+    const button = event.relatedTarget
+    const nomeCliente = button.getAttribute('data-cliente')
+    const mensagem = document.querySelector('.modal-body')
+    mensagem.innerHTML = (`Deseja realmente excluir <strong>${nomeCliente}</strong>?`)
+  })
+
+  //
+</script>
