@@ -1,0 +1,111 @@
+<h1>Atualizar dados</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form action="/clientes/edit" method="POST">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputName">Nome</label>
+                    <input type="text" id="input" name="nome" class="form-control" placeholder="Maria"
+                        value="{{cliente.nome}}" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputSobrenome">Sobrenome</label>
+                    <input type="text" class="form-control" id="inputSobrenome" name="sobrenome"
+                        placeholder="Aparecida do Santos" value="{{cliente.sobrenome}}" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4">Email</label>
+                    <input type="email" class="form-control" id="inputEmail4" name="email"
+                        placeholder="mariaaparecida@email.com" value="{{cliente.email}}">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputTelefone">Telefone</label>
+                    <input type="number" class="form-control" id="inputTelefone" name="telefone"
+                        placeholder="11999999999" value="{{cliente.telefone}}" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputCpf">CPF</label>
+                    <input type="number" class="form-control" id="inputCPF" name="cpf" placeholder="90980883888"
+                        value="{{cliente.cpf}}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputAddress">Endereço</label>
+                <input type="text" class="form-control" id="inputAddress" name="endereco"
+                    placeholder="Av Vinicius de Morais" value="{{cliente.endereco}}" >
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputZip">Número</label>
+                <input type="number" class="form-control" id="inputnumero" name="numero" value="{{cliente.numero}}"
+                    required>
+            </div>
+            <div class="form-group">
+                <label for="inputBairro">Bairro</label>
+                <input type="text" class="form-control" id="inputBairro" name="bairro" placeholder="JD.Apura"
+                    value="{{cliente.bairro}}">
+            </div>
+            <div class="form-group">
+                <label for="inputAddress2">Complemento</label>
+                <input type="text" class="form-control" id="inputAddress2" name="complemento"
+                    placeholder="Apartamento, casa, sítio..." value="{{cliente.complemento}}">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputCity">Cidade</label>
+                    <input type="text" class="form-control" id="inputCity" name="cidade" placeholder="São Paulo"
+                        value="{{cliente.cidade}}" required>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="inputZip">CEP</label>
+                    <input type="number" class="form-control" id="inputZip" name="cep" value="{{cliente.cep}}" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="inputState">Estado</label>
+                    <select id="inputState" name="estado" class="form-control">
+                        <option selected hidden>Escolha...</option>
+                        <option value="AC">Acre</option>
+                        <option value="AL">Alagoas</option>
+                        <option value="AP">Amapá</option>
+                        <option value="AM">Amazonas</option>
+                        <option value="BA">Bahia</option>
+                        <option value="CE">Ceará</option>
+                        <option value="DF">Distrito Federal</option>
+                        <option value="ES">Espírito Santo</option>
+                        <option value="GO">Goiás</option>
+                        <option value="MA">Maranhão</option>
+                        <option value="MT">Mato Grosso</option>
+                        <option value="MS">Mato Grosso do Sul</option>
+                        <option value="MG">Minas Gerais</option>
+                        <option value="PA">Pará</option>
+                        <option value="PB">Paraíba</option>
+                        <option value="PR">Paraná</option>
+                        <option value="PE">Pernambuco</option>
+                        <option value="PI">Piauí</option>
+                        <option value="RJ">Rio de Janeiro</option>
+                        <option value="RN">Rio Grande do Norte</option>
+                        <option value="RS">Rio Grande do Sul</option>
+                        <option value="RO">Rondônia</option>
+                        <option value="RR">Roraima</option>
+                        <option value="SC">Santa Catarina</option>
+                        <option value="SP">São Paulo</option>
+                        <option value="SE">Sergipe</option>
+                        <option value="TO">Tocantins</option>
+                    </select>
+                </div>
+                <input type="hidden" name="id" value="{{cliente.id}}">
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Atualizar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const uf = '{{ cliente.uf }}' // valor retornado do banco de dados
+        const select = document.querySelector('select[name="estado"]');
+        const option = select.querySelector(`option[value="${uf}"]`);
+        option.selected = true
+    })
+
+</script>

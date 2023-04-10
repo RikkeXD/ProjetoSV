@@ -17,8 +17,15 @@ const clientes = require('./routes/clientes')
         app.use(express.json())
     //Handlebars
         app.engine('handlebars', handlebars.engine
-        ({defaultLayout: 'main',}))
+        ({defaultLayout: 'main',
+        helpers: {
+            stringify: (obj) =>{
+                return JSON.stringify(obj)
+            }
+        }
+    }))
         app.set('view engine', 'handlebars')
+        
     // Public
         app.use(express.static(path.join(__dirname,'public')))
     //Body-Parser
