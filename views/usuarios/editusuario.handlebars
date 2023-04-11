@@ -1,3 +1,8 @@
+{{#each erro}}
+    <div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
 <div class="card">
     <div class="card-body">
         <form action="/usuarios/edit" method="post">
@@ -7,7 +12,7 @@
                 </div>
                 <div class="col-auto">
                     <input type="text" name="nome" class="form-control" value="{{usuario.nome}}" aria-labelledby="nome"
-                        required>
+                        >
                 </div>
                 <div class="col-auto">
                     <span id="nome" class="form-text">
@@ -21,7 +26,7 @@
                 </div>
                 <div class="col-auto">
                     <input type="text" name="sobrenome" class="form-control " aria-labelledby="sobrenome"
-                        value="{{usuario.sobrenome}}" required>
+                        value="{{usuario.sobrenome}}" >
                 </div>
                 <div class="col-auto">
                     <span id="sobrenome" class="form-text">
@@ -35,7 +40,7 @@
                 </div>
                 <div class="col-auto">
                     <input type="email" id="email" name="email" class="form-control " aria-labelledby="email"
-                        value="{{usuario.email}}" required>
+                        value="{{usuario.email}}" >
                 </div>
                 <div class="col-auto">
                     <span id="email" class="form-text">

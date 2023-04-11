@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Cliente = require('../models/Cliente')
+const { Sequelize } = require('sequelize')
 
 router.get('/cadastro', (req, res) => {
     res.render('clientes/cadastroclientes')
@@ -83,12 +84,12 @@ router.get('/edit/:id', async (req, res) => {
     try {
         const clienteup = await Cliente.findOne({ where: { id: req.params.id } })
         const upJSON = clienteup.toJSON()
-        res.render('clientes/update', {cliente: upJSON})
+        res.render('clientes/update', { cliente: upJSON })
     }
     catch (err) {
         console.log(`Cliente não encontrada`)
     }
-    
+
 })
 
 router.post('/edit', async (req, res) => {
@@ -131,8 +132,8 @@ router.post('/edit', async (req, res) => {
         erros.push({ texto: 'Estado invalido!' })
     }
     if (erros.length > 0) {
-        res.render(`clientes/update`, { erros: erros,cliente:cliente })
-    }else{
+        res.render(`clientes/update`, { erros: erros, cliente: cliente })
+    } else {
 
         //Update caso os requisitos sejam atendidos
         const updateCliente = await Cliente.update({
@@ -147,25 +148,36 @@ router.post('/edit', async (req, res) => {
             cidade: req.body.cidade,
             cep: req.body.cep,
             uf: req.body.estado
-        }, {where: {id: req.body.id}}).then(()=>{
+        }, { where: { id: req.body.id } }).then(() => {
             req.flash('success_msg', 'Alteração atualizada com sucesso!')
             res.redirect('/clientes')
-        }).catch((err)=>{
+        }).catch((err) => {
             req.flash('error_msg', 'Erro ao atualizar os dados')
             res.redirect('/clientes')
         })
     }
 })
 
-router.post('/delete', async(req,res)=>{
-    console.log(req.params.id)
-    const deleteCliente = await Cliente.destroy({where: {id: req.body.deleteid}}).then(()=>{
+router.post('/delete', async (req, res) => {
+    const deleteCliente = await Cliente.destroy({ where: { id: req.body.deleteid } }).then(() => {
         req.flash('success_msg', 'Cliente deletado com sucesso! ')
         res.redirect('/clientes')
-    }).catch((err)=>{
+    }).catch((err) => {
         req.flash('error_msg', 'Erro ao deletar o cliente')
         res.redirect('/clientes')
     })
+})
+
+router.post('/pesquisa', async (req, res) => {
+    try {
+        const pesquisaCliente = await Cliente.findAll({ where: Sequelize.literal(`CONCAT_WS(' ', id, nome, sobrenome, telefone, cpf, email) LIKE '%${req.body.pesquisa}%'`) })
+        
+        const pesquisaClienteJSON = pesquisaCliente.map(cliente => cliente.toJSON())
+        res.render('clientes/clientes', {clientes: pesquisaClienteJSON})
+    } catch (err) {
+        console.log(err)
+    }
+
 })
 
 module.exports = router

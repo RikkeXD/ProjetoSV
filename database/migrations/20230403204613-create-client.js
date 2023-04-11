@@ -48,6 +48,10 @@ module.exports = {
         complemento:{
           type: Sequelize.STRING
         },
+        cidade:{
+          type: Sequelize.STRING,
+          allowNull: false
+        },
         uf:{
           type: Sequelize.STRING,
           allowNull: false

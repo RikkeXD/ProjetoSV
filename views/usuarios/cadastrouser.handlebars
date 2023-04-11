@@ -12,7 +12,7 @@
                     <label for="nome" class="col-form-label">Nome</label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" name="nome" class="form-control" aria-labelledby="nome" required>
+                    <input type="text" name="nome" class="form-control" aria-labelledby="nome" value="{{usuario.nome}}" >
                 </div>
                 <div class="col-auto">
                     <span id="nome" class="form-text">
@@ -25,7 +25,7 @@
                     <label for="sobrenome" class="col-form-label">Sobrenome</label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" name="sobrenome" class="form-control " aria-labelledby="sobrenome" required>
+                    <input type="text" name="sobrenome" class="form-control " aria-labelledby="sobrenome" value="{{usuario.sobrenome}}" required>
                 </div>
                 <div class="col-auto">
                     <span id="sobrenome" class="form-text">
@@ -38,7 +38,7 @@
                     <label for="email" class="col-form-label">Email</label>
                 </div>
                 <div class="col-auto">
-                    <input type="email" id="email" name="email" class="form-control " aria-labelledby="email" required>
+                    <input type="email" id="email" name="email" class="form-control " aria-labelledby="email" value="{{usuario.email}}" required>
                 </div>
                 <div class="col-auto">
                     <span id="email" class="form-text">

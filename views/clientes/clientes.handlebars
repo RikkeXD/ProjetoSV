@@ -1,5 +1,16 @@
 {{#if clientes}}
 
+<h1>Clientes</h1>
+<form action="/clientes/pesquisa" method="post">
+
+  <div class="input-group">
+    <input type="search" class="form-control rounded" placeholder="Pesquisar" aria-label="Search"
+      aria-describedby="search-addon" name="pesquisa" />
+    <button type="submit" class="btn btn-outline-primary">Pesquisar</button>
+  </div>
+</form>
+<hr>
+
 <table class="table">
   <thead>
     <tr>
@@ -10,7 +21,7 @@
       <th scope="col" class="d-flex justify-content-center">AÇÕES</th>
     </tr>
   </thead>
-  
+
   <tbody>
     {{#each clientes}}
     <tr>
@@ -20,9 +31,11 @@
       <td>{{email}}</td>
       <td>
         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-          <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#ModalVisualizar" data-dcliente='{{stringify this}}'>Visualizar</button>
+          <button class="btn btn-info btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#ModalVisualizar"
+            data-dcliente='{{stringify this}}'>Visualizar</button>
           <a href="/clientes/edit/{{id}}"><button class="btn btn-warning btn-sm" type="button">Editar</button></a>
-          <button class="btn btn-danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#ModalExluir" data-cliente="{{nome}} {{sobrenome}}" data-id="{{id}}">Excluir</button>
+          <button class="btn btn-danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#ModalExluir"
+            data-cliente="{{nome}} {{sobrenome}}" data-id="{{id}}">Excluir</button>
         </div>
       </td>
     </tr>
@@ -33,109 +46,111 @@
         <div class="modal-content">
           <div class="modal-header">
             <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmar Exclusão</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
           <div class="modal-body">
             Deseje realmente exluir?
-        </div>
+          </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
             <form action="/clientes/delete" method="post">
               <button type="submit" class="btn btn-danger">Confirmar</button>
               <input type="hidden" name="deleteid" value="">
             </form>
-            
+
           </div>
         </div>
       </div>
     </div>
 
     <!-- Modal Visualizar -->
-    
-<div class="modal fade" id="ModalVisualizar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="tituloModal">New message</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
 
-          <div class="row">
-            <div class="col-md-2">
-              <label for="recipient-name" class="col-form-control">ID</label>
-              <input type="text" class="form-control" name="id" disabled>
-            </div>
-            <div class="col-md-6">
-              <label for="recipient-name" class="col-form-control">Nome</label>
-              <input type="text" class="form-control" name="nome" id="nome" disabled>
-            </div>
-            <div class="col-md-4">
-                <label for="" class="col-form-control">Telefone</label>
-                <input type="text" class="form-control" name="telefone" disabled>
-            </div>
+    <div class="modal fade" id="ModalVisualizar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="tituloModal">New message</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+          <div class="modal-body">
+            <form>
 
-          <div class="row">
-              <div class="col-md-6">
-                <label for="" class="col-form-control">E-mail</label>
-                <input type="text" class="form-control" name="email" disabled>
+              <div class="row">
+                <div class="col-md-2">
+                  <label for="recipient-name" class="col-form-control">ID</label>
+                  <input type="text" class="form-control" name="id" disabled>
+                </div>
+                <div class="col-md-6">
+                  <label for="recipient-name" class="col-form-control">Nome</label>
+                  <input type="text" class="form-control" name="nome" id="nome" disabled>
+                </div>
+                <div class="col-md-4">
+                  <label for="" class="col-form-control">Telefone</label>
+                  <input type="text" class="form-control" name="telefone" disabled>
+                </div>
               </div>
-              <div class="col-md-4">
-                <label for="" class="col-form-control">CPF</label>
-                <input type="text" class="form-control" name="cpf" disabled>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="" class="col-form-control">E-mail</label>
+                  <input type="text" class="form-control" name="email" disabled>
+                </div>
+                <div class="col-md-4">
+                  <label for="" class="col-form-control">CPF</label>
+                  <input type="text" class="form-control" name="cpf" disabled>
+                </div>
               </div>
-          </div>
-          <div class="row">
-              <div class="col-md-6">
-                <label for="" class="col-form-control">Endereço</label>
-                <input type="text" class="form-control" name="endereco" disabled>
-              </div>
-              <div class="col-md-2">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="" class="col-form-control">Endereço</label>
+                  <input type="text" class="form-control" name="endereco" disabled>
+                </div>
+                <div class="col-md-2">
                   <label for="" class="col-form-control">Nº</label>
                   <input type="text" class="form-control" name="numero" disabled>
-              </div>
-              <div class="col-md-4">
+                </div>
+                <div class="col-md-4">
                   <label for="" class="col-form-control">Bairro</label>
                   <input type="text" class="form-control" name="bairro" disabled>
+                </div>
               </div>
-          </div>
-            <div class="row">
-              <div class="col-md-4">
+              <div class="row">
+                <div class="col-md-4">
                   <label for="" class="col-form-control">CEP</label>
                   <input type="text" class="form-control" name="cep" disabled>
-              </div>
-              <div class="col-md-4">
+                </div>
+                <div class="col-md-4">
                   <label for="" class="col-form-control">Cidade</label>
                   <input type="text" class="form-control" name="cidade" disabled>
-              </div>
-              <div class="col-md-1">
+                </div>
+                <div class="col-md-1">
                   <label for="" class="col-form-control">UF</label>
                   <input type="text" class="form-control" name="uf" disabled readonly>
+                </div>
               </div>
-            </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-        
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
     {{else}}
     {{/each}}
   </tbody>
 </table>
 {{else}}
-  <div class="text-bg-secondary p-3"><h1 class="fs-5">Não existe clientes cadastradas</h1></div>
+<div class="text-bg-secondary p-3">
+  <h1 class="fs-5">Não existe clientes cadastradas</h1>
+</div>
 {{/if}}
 
 <script>
   //Informando o nome do cliente cadastrado
-  document.querySelector('#ModalExluir').addEventListener('show.bs.modal', function(event){
+  document.querySelector('#ModalExluir').addEventListener('show.bs.modal', function (event) {
     const button = event.relatedTarget
     const nomeCliente = button.getAttribute('data-cliente')
     const idCliente = button.getAttribute('data-id')
@@ -146,12 +161,12 @@
   })
 
   //
-  document.querySelector('#ModalVisualizar').addEventListener('show.bs.modal', function(event){
+  document.querySelector('#ModalVisualizar').addEventListener('show.bs.modal', function (event) {
     const buttonD = event.relatedTarget
     const dadosCliente = JSON.parse(buttonD.getAttribute('data-dcliente'))
     document.querySelector('#tituloModal').innerHTML = `Cadastro: ${dadosCliente.nome} ${dadosCliente.sobrenome}`
     document.querySelector('[name="id"]').value = dadosCliente.id
-    document.querySelector('[name="nome"]').value = dadosCliente.nome + ' ' +dadosCliente.sobrenome
+    document.querySelector('[name="nome"]').value = dadosCliente.nome + ' ' + dadosCliente.sobrenome
     document.querySelector('[name="telefone"]').value = dadosCliente.telefone
     document.querySelector('[name="email"]').value = dadosCliente.email
     document.querySelector('[name="cpf"]').value = dadosCliente.cpf
