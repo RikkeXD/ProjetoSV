@@ -1,0 +1,31 @@
+<h1>Gerenciamento de Usuários</h1>
+{{#if usuarios}}
+    
+        <table class="table table-striped">
+        <thead>
+            <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nome</th>
+            <th scope="col">E-Mail</th>
+            <th scope="col">Permissão</th>
+            <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each usuarios}}
+            <tr>
+            <th scope="row">{{id}}</th>
+            <td>{{nome}} {{sobrenome}}</td>
+            <td>{{email}}</td>
+            <td>{{permissao}}</td>
+            <td>
+                <a href="/usuarios/edit/{{id}}"><button class="btn btn-warning btn-sm" type="button">Editar</button></a>
+            </td>
+            </tr>
+            {{else}}
+            {{/each}}
+        </tbody>
+        </table>
+{{else}}
+    <div class="text-bg-secondary p-3"><h1 class="fs-5">Não existe usuarios cadastradas</h1></div>
+{{/if}}

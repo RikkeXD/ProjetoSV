@@ -46,5 +46,30 @@ router.post('/cadastro', async (req,res)=>{
         })
     }
 })
+
+router.get('/', async(req, res)=>{
+    const usuarios = await Usuario.findAll({}).then((usuario)=>{
+        const usuariosJSON = usuario.map(usuario => usuario.toJSON())
+        res.render('usuarios/usuarios', {usuarios: usuariosJSON})
+    }).catch((err)=>{
+        req.flash('error_msg','Ocorreu um erro ao carregar os usuarios')
+        res.redirect('/home')
+    })
     
+})
+router.get('/edit/:id',async(req,res)=>{
+    try{
+        const usuarioedit = await Usuario.findOne({where: {id: req.params.id}})
+        const UsuarioEditJSON = usuarioedit.toJSON()
+        res.render('usuarios/editusuario', {usuario: UsuarioEditJSON})
+    } catch {
+        req.flash('error_msg', 'Erro ao carregar este usuário!')
+        res.redirect('/home')
+    }
+    
+})
+
+router.post('/edit',async(req,res)=>{
+    const UserEdit = await 
+})
 module.exports = router
