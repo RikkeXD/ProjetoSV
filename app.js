@@ -8,7 +8,8 @@ const handlebars = require('express-handlebars')//Engine para o Front-End
 const path = require('path')//Realizar caminho padrão para alguns recursos
 const usuarios = require('./routes/usuarios')//Importando as Rotas do usuario
 const home = require('./routes/home')//Importando as Rotas do usuario
-const clientes = require('./routes/clientes')
+const clientes = require('./routes/clientes') //Importando as Rotas do cliente
+const produtos = require('./routes/produtos')
 
 //Configurações
     //Banco de Dados
@@ -55,6 +56,7 @@ const clientes = require('./routes/clientes')
     app.use('/usuarios', usuarios)
     app.use('/home', home)
     app.use('/clientes', clientes)
+    app.use('/produtos', produtos)
     
     //Servidor
     const port = 8081
