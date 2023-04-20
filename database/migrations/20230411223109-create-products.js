@@ -7,6 +7,7 @@ module.exports = {
       id:{
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
         type: Sequelize.INTEGER
       },
       nome:{
@@ -17,7 +18,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
-      cod_barra:{
+      cod_barras:{
         type:Sequelize.STRING
       },
       created_at:{
@@ -25,7 +26,7 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
-      update_at:{
+      updated_at:{
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
