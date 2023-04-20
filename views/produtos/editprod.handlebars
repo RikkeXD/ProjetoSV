@@ -1,0 +1,23 @@
+<h1>Editar produtos</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form action="/produtos/editprod">
+        <div class="mb-3">
+            <label for="formGroupExampleInput" class="form-label">Nome</label>
+            <input type="text" class="form-control" id="formGroupExampleInput" name="nome" value="{{produto.nome}}">
+        </div>
+        <div class="mb-3">
+            <label for="formGroupExampleInput2" class="form-label">Fornecedor</label>
+            <input type="text" class="form-control" id="formGroupExampleInput2" name="fornecedor" value="{{produto.fornecedor}}">
+        </div>
+        <div class="mb-3">
+            <label for="formGroupExampleInput2" class="form-label">Codigo de Barras</label>
+            <input type="text" class="form-control" id="formGroupExampleInput2" name="cod_barras" value="{{produto.cod_barras}}">
+            <input type="hidden" name="id" value="{{id}}">
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Atualizar Produto</button>
+        <a href="/produtos"><button type="button" class="btn btn-secondary btn-sm">Voltar</button></a>
+        </form>
+    </div>
+</div>

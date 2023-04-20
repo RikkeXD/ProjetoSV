@@ -43,4 +43,18 @@ router.post('/cadastrar', async(req,res)=>{
     }
 
 })
+
+router.get('/editprod/:id', async(req, res) =>{
+    try{
+        const produto = await Produto.findOne({where:{id: req.params.id}})
+        const produtoJSON = produto.toJSON()
+        res.render("produtos/editprod", {produto: produtoJSON})
+        console.log(produtoJSON)
+    } catch (err) {
+        req.flash('error_msg', 'Erro ao carregar produto')
+        res.redirect('/home')
+    }
+        
+})
+
 module.exports = router
