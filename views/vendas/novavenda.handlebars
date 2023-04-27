@@ -1,41 +1,69 @@
 <h1>Nova Venda</h1>
 
-<input type="text" id="searchInput">
-<div id="searchResults"></div>
-<h2>Busca:</h2>
-{{#each clientes}}
-<p>id: {{id}}</p>
-<p>nome: {{nome}}</p>
-{{else}}
-{{/each}}
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalCliente">Buscar
+    cliente</button>
 
+<div class="modal fade" id="ModalCliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
 
-<script>
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', () => {
-        const searchTerm = searchInput.value;
-        const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                const results = JSON.parse(this.responseText);
-                // Atualiza a exibição dos resultados na página HTML
-            }
-        };
-        xhr.open("GET", `/clientes/search?term=${searchTerm}`, true);
-        xhr.send();
-    });
-    const searchResults = document.getElementById('searchResults');
-    searchResults.innerHTML = '';
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">First</th>
+                                <th scope="col">Last</th>
+                                <th scope="col">Handle</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <a href="#" class="list-group-item-action">
+                                <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                                <td>@mdo</td>
+                                </tr>
+                            </a>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>Jacob</td>
+                                <td>Thornton</td>
+                                <td>@fat</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td colspan="2">Larry the Bird</td>
+                                <td>@twitter</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-    if (results.length > 0) {
-        results.forEach(cliente => {
-            const clienteHTML = `
-      <p>id: ${cliente.id}</p>
-      <p>nome: ${cliente.nome}</p>
-    `;
-            searchResults.insertAdjacentHTML('beforeend', clienteHTML);
-        });
-    } else {
-        searchResults.insertAdjacentHTML('beforeend', '<p>Nenhum resultado encontrado</p>');
-    }
-</script>
+                    <!-- /////////////////////////// -->
+                    <a href="/admin/editusuario/{{_id}}" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">Nome do usuario: {{nome}}</h5>
+                            <small>ID: {{_id}}</small>
+                        </div>
+                        <input type="hidden" name="id" value="{{_id}}">
+                        <p class="mb-1">Email: {{email}}</p>
+                        {{#if eAdmin}}
+                        <small>Administrador</small>
+                        {{else}}
+                        <small>Usuario Padrão</small>
+                        {{/if}}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Send message</button>
+            </div>
+        </div>
+    </div>
+</div>
