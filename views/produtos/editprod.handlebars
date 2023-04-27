@@ -1,23 +1,54 @@
+{{#each erros}}
+    <div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
 <h1>Editar produtos</h1>
 
 <div class="card">
     <div class="card-body">
-        <form action="/produtos/editprod">
-        <div class="mb-3">
-            <label for="formGroupExampleInput" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="formGroupExampleInput" name="nome" value="{{produto.nome}}">
-        </div>
-        <div class="mb-3">
-            <label for="formGroupExampleInput2" class="form-label">Fornecedor</label>
-            <input type="text" class="form-control" id="formGroupExampleInput2" name="fornecedor" value="{{produto.fornecedor}}">
-        </div>
-        <div class="mb-3">
-            <label for="formGroupExampleInput2" class="form-label">Codigo de Barras</label>
-            <input type="text" class="form-control" id="formGroupExampleInput2" name="cod_barras" value="{{produto.cod_barras}}">
-            <input type="hidden" name="id" value="{{id}}">
-        </div>
-        <button type="submit" class="btn btn-primary btn-sm">Atualizar Produto</button>
-        <a href="/produtos"><button type="button" class="btn btn-secondary btn-sm">Voltar</button></a>
+        <form action="/produtos/editprod" method="post">
+            <div class="mb-3">
+                <label for="formGroupExampleInput" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="formGroupExampleInput" name="nome" value="{{produto.nome}}" required>
+            </div>
+            <div class="mb-3">
+                <label for="formGroupExampleInput2" class="form-label">Fornecedor</label>
+                <input type="text" class="form-control" id="formGroupExampleInput2" name="fornecedor" value="{{produto.fornecedor}}" required>
+            </div>
+            <div class="mb-3">
+                <label for="formGroupExampleInput2" class="form-label">Codigo de Barras</label>
+                <input type="text" class="form-control" id="formGroupExampleInput2" name="cod_barras" value="{{produto.cod_barras}}" >
+                <input type="hidden" name="id" value="{{produto.id}}">
+            </div>
+            <div class="d-flex mb-3">
+                <div class="p-2"><button type="submit" class="btn btn-primary btn-sm">Atualizar Produto</button></div>
+                <div class="p-2"><a href="/produtos"><button type="button" class="btn btn-secondary btn-sm">Voltar</button></a></div>
+                <div class="ms-auto p-2"><button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#ModalDeletar">Deletar</button></div>
+            </div>
         </form>
     </div>
+</div>
+
+<!-- MODAL Confirmação para Deletar-->
+
+<div class="modal fade" id="ModalDeletar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Deletar Produto</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Deseja deletar esse produto ?
+      </div>
+      <div class="modal-footer">
+        <form action="/produtos/delete" method="post">
+            <input type="hidden" value="{{produto.id}}" name="id">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="submmit" class="btn btn-danger">Deletar</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

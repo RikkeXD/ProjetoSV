@@ -1,0 +1,41 @@
+<h1>Nova Venda</h1>
+
+<input type="text" id="searchInput">
+<div id="searchResults"></div>
+<h2>Busca:</h2>
+{{#each clientes}}
+<p>id: {{id}}</p>
+<p>nome: {{nome}}</p>
+{{else}}
+{{/each}}
+
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value;
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                const results = JSON.parse(this.responseText);
+                // Atualiza a exibição dos resultados na página HTML
+            }
+        };
+        xhr.open("GET", `/clientes/search?term=${searchTerm}`, true);
+        xhr.send();
+    });
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '';
+
+    if (results.length > 0) {
+        results.forEach(cliente => {
+            const clienteHTML = `
+      <p>id: ${cliente.id}</p>
+      <p>nome: ${cliente.nome}</p>
+    `;
+            searchResults.insertAdjacentHTML('beforeend', clienteHTML);
+        });
+    } else {
+        searchResults.insertAdjacentHTML('beforeend', '<p>Nenhum resultado encontrado</p>');
+    }
+</script>

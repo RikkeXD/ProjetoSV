@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Cliente = require('../models/Cliente')
 const { Sequelize } = require('sequelize')
-
+const { Op } = require('sequelize')
 router.get('/cadastro', (req, res) => {
     res.render('clientes/cadastroclientes')
 })
@@ -171,13 +171,36 @@ router.post('/delete', async (req, res) => {
 router.post('/pesquisa', async (req, res) => {
     try {
         const pesquisaCliente = await Cliente.findAll({ where: Sequelize.literal(`CONCAT_WS(' ', id, nome, sobrenome, telefone, cpf, email) LIKE '%${req.body.pesquisa}%'`) })
-        
+
         const pesquisaClienteJSON = pesquisaCliente.map(cliente => cliente.toJSON())
-        res.render('clientes/clientes', {clientes: pesquisaClienteJSON})
+        res.render('clientes/clientes', { clientes: pesquisaClienteJSON })
     } catch (err) {
         console.log(err)
     }
 
 })
 
+
+//Exemplo Busca
+
+router.get('/search', async (req, res) => {
+    try {
+        const filter = req.query.filter ? req.query.filter.toLowerCase() : '';
+        const searchTerm = req.query.term;
+        const results = await Cliente.findAll({
+            where: {
+                [Op.or]: [
+                    Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('nome')), 'LIKE', `%${filter}%`),
+                    Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('email')), 'LIKE', `%${filter}%`),
+                ],
+            }
+        });
+        const resultsJSON = results.map(cliente => cliente.toJSON())
+        console.log(resultsJSON)
+        res.render('vendas/novavenda', { clientes: resultsJSON })
+    } catch (err) {
+        console.log(err)
+    }
+
+});
 module.exports = router

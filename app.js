@@ -10,6 +10,7 @@ const usuarios = require('./routes/usuarios')//Importando as Rotas do usuario
 const home = require('./routes/home')//Importando as Rotas do usuario
 const clientes = require('./routes/clientes') //Importando as Rotas do cliente
 const produtos = require('./routes/produtos')
+const vendas = require('./routes/vendas')
 
 //Configurações
     //Banco de Dados
@@ -57,6 +58,7 @@ const produtos = require('./routes/produtos')
     app.use('/home', home)
     app.use('/clientes', clientes)
     app.use('/produtos', produtos)
+    app.use('/vendas', vendas)
     
     //Servidor
     const port = 8081
