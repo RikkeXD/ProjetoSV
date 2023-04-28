@@ -177,6 +177,19 @@ router.post('/pesquisa', async (req, res) => {
     } catch (err) {
         console.log(err)
     }
-
 })
+
+app.get('/venda', function (req, res) {
+    // Consulta o banco de dados ou outra fonte de dados
+    var cliente = {
+        id: 1,
+        nome: 'Fulano de Tal',
+        telefone: '1234567890',
+        cpf: '123.456.789-00',
+        endereco: 'Rua Tal, 123'
+    };
+
+    // Renderiza o template Handlebars com os dados do cliente
+    res.render('modal-cliente', {cliente: cliente});
+});
 module.exports = router

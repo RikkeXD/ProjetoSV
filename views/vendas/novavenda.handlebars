@@ -3,61 +3,63 @@
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalCliente">Buscar
     cliente</button>
 
+
+
+<!--Modal CLIENTES-->
 <div class="modal fade" id="ModalCliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
 
+                <!--Barra de Pesquisa-->
+                <div class="grid text-center">
+                    <div class="g-col-4 input-group mb-3">
+                        <div class="">
+                            <select class="form-select " id="inputGroupSelect02">
+                                <option selected>Buscar...</option>
+                                <option value="1">Nome</option>
+                                <option value="2">Telefone</option>
+                                <option value="3">CPF</option>
+                            </select>
+                        </div>
+                        <input type="text" class="form-control ms-1" aria-label="Text input with dropdown button">
+                        <button class="btn btn-outline-secondary" type="button" id="btn-pesquisar">Pesquisar</button>
+                    </div>
+                </div>
+                <form>
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">First</th>
-                                <th scope="col">Last</th>
-                                <th scope="col">Handle</th>
+                                <th scope="col">ID</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Telefone</th>
+                                <th scope="col">CPF</th>
+                                <th scope="col">Endereço</th>
+                                <th scope="col">Escolher</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <a href="#" class="list-group-item-action">
-                                <tr>
-                                <th scope="row">1</th>
-                                <td>Mark</td>
-                                <td>Otto</td>
-                                <td>@mdo</td>
-                                </tr>
+                            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <tr>
+                                        <th scope="row">1</th>
+                                        <td>Marco</td>
+                                        <td>11989312399</td>
+                                        <td>50620773898</td>
+                                        <td>Rua glycerio almeida maciel</td>
+                                        <td><a href="#"
+                                                class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                                                Selecionar
+                                            </a></td>
+                                    </tr>
+                                </div>
                             </a>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>Jacob</td>
-                                <td>Thornton</td>
-                                <td>@fat</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td colspan="2">Larry the Bird</td>
-                                <td>@twitter</td>
-                            </tr>
                         </tbody>
                     </table>
-
-                    <!-- /////////////////////////// -->
-                    <a href="/admin/editusuario/{{_id}}" class="list-group-item list-group-item-action flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">Nome do usuario: {{nome}}</h5>
-                            <small>ID: {{_id}}</small>
-                        </div>
-                        <input type="hidden" name="id" value="{{_id}}">
-                        <p class="mb-1">Email: {{email}}</p>
-                        {{#if eAdmin}}
-                        <small>Administrador</small>
-                        {{else}}
-                        <small>Usuario Padrão</small>
-                        {{/if}}
                 </form>
             </div>
             <div class="modal-footer">
@@ -67,3 +69,21 @@
         </div>
     </div>
 </div>
+
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("btn-pesquisar").addEventListener("click", function() {
+        var valorPesquisa = document.getElementById("inputGroupSelect02").value;
+        // Faz a solicitação AJAX para a rota '/clientes/venda' com o valor da pesquisa como parâmetro
+        fetch('/clientes/venda?pesquisa=' + valorPesquisa)
+            .then(response => response.json())
+            .then(data => {
+                // Compila o template Handlebars com os dados retornados do servidor
+                var template = Handlebars.compile(document.getElementById("tabela-clientes-template").innerHTML);
+                var html = template({clientes: data});
+                // Atualiza o conteúdo do modal com os resultados
+                document.getElementById("tabela-clientes").getElementsByTagName("tbody")[0].innerHTML = html;
+            });
+    });
+});
+</script>
