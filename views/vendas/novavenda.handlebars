@@ -1,89 +1,376 @@
 <h1>Nova Venda</h1>
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalCliente">Buscar
-    cliente</button>
+<!--AREA PRINCIPAL-->
 
+<div class="card">
+    <div class="card-body">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalCliente">Buscar
+            cliente</button>
 
-
-<!--Modal CLIENTES-->
-<div class="modal fade" id="ModalCliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        {{#if cliente}}
+        <div class="row">
+            <div class="col">
+                <label for="">Nome:</label>
+                <input type="text" class="form-control" aria-label="First name"
+                    value="{{cliente.nome}} {{cliente.sobrenome}}" disabled>
             </div>
-            <div class="modal-body">
-
-                <!--Barra de Pesquisa-->
-                <div class="grid text-center">
-                    <div class="g-col-4 input-group mb-3">
-                        <div class="">
-                            <select class="form-select " id="inputGroupSelect02">
-                                <option selected>Buscar...</option>
-                                <option value="1">Nome</option>
-                                <option value="2">Telefone</option>
-                                <option value="3">CPF</option>
-                            </select>
-                        </div>
-                        <input type="text" class="form-control ms-1" aria-label="Text input with dropdown button">
-                        <button class="btn btn-outline-secondary" type="button" id="btn-pesquisar">Pesquisar</button>
-                    </div>
-                </div>
-                <form>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">Nome</th>
-                                <th scope="col">Telefone</th>
-                                <th scope="col">CPF</th>
-                                <th scope="col">Endereço</th>
-                                <th scope="col">Escolher</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <tr>
-                                        <th scope="row">1</th>
-                                        <td>Marco</td>
-                                        <td>11989312399</td>
-                                        <td>50620773898</td>
-                                        <td>Rua glycerio almeida maciel</td>
-                                        <td><a href="#"
-                                                class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
-                                                Selecionar
-                                            </a></td>
-                                    </tr>
-                                </div>
-                            </a>
-                        </tbody>
-                    </table>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Send message</button>
+            <div class="col">
+                <label for="">Telefone:</label>
+                <input type="text" class="form-control" aria-label="Last name" value="{{cliente.telefone}}" disabled>
             </div>
         </div>
-    </div>
-</div>
+        <div class="row">
+            <div class="col">
+                <label for="">CPF:</label>
+                <input type="text" class="form-control" aria-label="First name" value="{{cliente.cpf}}" disabled>
+            </div>
+            <div class="col">
+                <label for="">E-mail:</label>
+                <input type="text" class="form-control" aria-label="Last name" value="{{cliente.email}}" disabled>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="">Endereço:</label>
+                    <input type="text" class="form-control" aria-label="First name" value="{{cliente.endereco}}"
+                        disabled>
+                </div>
+                <div class="col">
+                    <label for="">Nº</label>
+                    <input type="text" class="form-control" aria-label="Last name" value="{{cliente.numero}}" disabled>
+                </div>
+                <div class="col">
+                    <label for="">Bairro:</label>
+                    <input type="text" class="form-control" aria-label="Last name" value="{{cliente.bairro}}" disabled>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="">Complemento:</label>
+                    <input type="text" class="form-control" aria-label="First name" value="{{cliente.complemento}}"
+                        disabled>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="">CEP:</label>
+                        <input type="text" class="form-control" aria-label="First name" value="{{cliente.cep}}"
+                            disabled>
+                    </div>
+                    <div class="col">
+                        <label for="">Cidade:</label>
+                        <input type="text" class="form-control" aria-label="Last name" value="{{cliente.cidade}}"
+                            disabled>
+                    </div>
+                    <div class="col">
+                        <label for="">UF:</label>
+                        <input type="text" class="form-control" aria-label="Last name" value="{{cliente.uf}}" disabled>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<script>
-   document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("btn-pesquisar").addEventListener("click", function() {
-        var valorPesquisa = document.getElementById("inputGroupSelect02").value;
-        // Faz a solicitação AJAX para a rota '/clientes/venda' com o valor da pesquisa como parâmetro
-        fetch('/clientes/venda?pesquisa=' + valorPesquisa)
-            .then(response => response.json())
-            .then(data => {
-                // Compila o template Handlebars com os dados retornados do servidor
-                var template = Handlebars.compile(document.getElementById("tabela-clientes-template").innerHTML);
-                var html = template({clientes: data});
-                // Atualiza o conteúdo do modal com os resultados
-                document.getElementById("tabela-clientes").getElementsByTagName("tbody")[0].innerHTML = html;
-            });
-    });
-});
-</script>
+        <!-- ______________SELEÇÃO DE PRODUTOS_____________ -->
+        <!-- Formulário HTML para adicionar um novo produto -->
+        <div class="container">
+            <h2 class="my-4">Adicionar Produto</h2>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="produto">Produto:</label>
+                    <select class="selectpicker" data-live-search="true" id="nome">
+                        <!-- Opções da lista suspensa -->
+                        {{#each produtos}}
+                        <option>{{nome}}</option>
+                        {{else}}
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group col-md-3 ">
+                    <label for="quantidade">Quantidade:</label>
+                    <input type="number" class="form-control" id="quantidade" min="1" value="1">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="valor">Valor:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                        <input type="text" class="form-control" id="valor" value="0,00">
+                    </div>
+                </div>
+                <div class="form-group col-md-2 mt-2">
+                    <br>
+                    <button class="btn btn-primary btn-block bottom-0" id="adicionar">Adicionar</button>
+                </div>
+                <!-- FORMA DE PAGAMENTO -->
+                <h3>Forma de Pagamento e Envio</h3>
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <select class="form-select" aria-label="Forma de Pagamento" id="pagamento">
+                                <option selected>Selecione a forma de pagamento</option>
+                                <option value="1">Cartão de Credito</option>
+                                <option value="2">Cartão de Debito</option>
+                                <option value="3">Pix</option>
+                            </select>
+                        </div>
+                        <div class="col col-lg-2">
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" placeholder="Parcela"
+                                    aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                <span class="input-group-text" id="basic-addon2">x</span>
+                            </div>
+                        </div>
+                        <div class="col col-lg-2">
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" placeholder="Parcela"
+                                    aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                <span class="input-group-text" id="basic-addon2">x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forma de Envio -->
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <select class="form-select" aria-label="Forma de envio" id="envio">
+                                <option selected>Selecione o modo do envio</option>
+                                <option value="1">SEDEX</option>
+                                <option value="2">PAC</option>
+                                <option value="3">Motoboy</option>
+                            </select>
+                        </div>
+                        <div class="col col-lg-4">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="basic-addon1">R$</span>
+                                <input type="text" class="form-control" placeholder="Valor do envio" aria-label="Valor Envio"
+                                    aria-describedby="basic-addon1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Quantidade</th>
+                            <th>Valor</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="produtos">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-right">Total:</th>
+                            <th id="total" data-total="0">R$ 0,00</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+
+            <!-- Arquivos CSS -->
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+            <link rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
+
+            <!-- Arquivos JS -->
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+            <script
+                src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+
+            <!--JS-->
+            <script>
+                const nome = document.querySelector("#nome");
+                const quantidade = document.querySelector("#quantidade");
+                const valor = document.querySelector("#valor");
+                const adicionarBtn = document.querySelector("#adicionar");
+                const produtosTbody = document.querySelector("#produtos");
+                const total = document.querySelector("#total");
+
+                // Adiciona evento de clique ao botão Adicionar
+                adicionarBtn.addEventListener("click", () => {
+                    // Cria uma nova linha para a tabela
+                    const linha = document.createElement("tr");
+
+                    // Cria as células da linha com os valores dos inputs
+                    const nomeCelula = document.createElement("td");
+                    nomeCelula.textContent = nome.value;
+
+                    const quantidadeCelula = document.createElement("td");
+                    quantidadeCelula.textContent = quantidade.value;
+
+                    const valorCelula = document.createElement("td");
+                    valorCelula.textContent = `R$ ${valor.value}`;
+
+                    const totalCelula = document.createElement("td");
+                    totalCelula.textContent = `R$ ${(quantidade.value * valor.value.replace(",", ".")).toFixed(2).replace(".", ",")}`;
+
+                    const excluirCelula = document.createElement("td");
+                    const excluirBtn = document.createElement("button");
+                    excluirBtn.classList.add("btn", "btn-danger");
+                    excluirBtn.textContent = "Excluir";
+                    excluirBtn.addEventListener("click", () => {
+                        // Remove a linha da tabela
+                        produtosTbody.removeChild(linha);
+
+                        // Recalcula o valor total
+                        const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
+                        let totalProdutos = 0;
+                        for (let i = 0; i < valoresLinhas.length; i++) {
+                            const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
+                            totalProdutos += valorProduto;
+                        }
+                        total.dataset.total = totalProdutos.toFixed(2);
+                        total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+                    });
+                    excluirCelula.appendChild(excluirBtn);
+
+                    // Adiciona as células na linha
+                    linha.appendChild(nomeCelula);
+                    linha.appendChild(quantidadeCelula);
+                    linha.appendChild(valorCelula);
+                    linha.appendChild(totalCelula);
+                    linha.appendChild(excluirCelula);
+
+                    // Adiciona a linha na tabela
+                    produtosTbody.appendChild(linha);
+
+                    // Limpa os campos de entrada de dados
+                    nome.value = "";
+                    quantidade.value = 1;
+                    valor.value = "0,00";
+
+                    // Recalcula o valor total
+                    const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
+                    let totalProdutos = 0;
+                    for (let i = 0; i < valoresLinhas.length; i++) {
+                        const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
+                        totalProdutos += valorProduto;
+                    }
+                    total.dataset.total = totalProdutos.toFixed(2);
+                    total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+                });
+            </script>
+
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"
+                integrity="sha384-oyYfs2AVtLEs0s+4dCGbGpNR7P0o0KvbxIk9ZB1JY4Q2+aCpeblsKz8t4mtePKpD"
+                crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"
+                integrity="sha384-lv9XK/+PpC5V6U+E1gciu2Qz5q3sz3B7bkjlBxOveVXuzZ+EYIUdhfKFsb0h0hqz"
+                crossorigin="anonymous"></script>
+
+            <!-- XXXX_____________________SELEÇÃO DE PRODUTOS________________________XXXX -->
+
+            {{else}}
+            {{/if}}
+
+            <!--Modal CLIENTES-->
+            <div class="modal fade" id="ModalCliente" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Pesquisar Clientes</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+
+                            <!--Barra de Pesquisa-->
+
+                            <div class="grid text-center">
+                                <div class="g-col-4 input-group mb-3">
+                                    <input type="text" class="form-control ms-1"
+                                        aria-label="Text input with dropdown button" id="barra-pesquisa">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        id="btn-pesquisar">Pesquisar</button>
+                                </div>
+
+                                <!--Barra de Pesquisa-->
+
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Nome</th>
+                                        <th scope="col">Telefone</th>
+                                        <th scope="col">CPF</th>
+                                        <th scope="col">Endereço</th>
+                                        <th scope="col">Escolher</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="tabela-clientes">
+                                    {{#each clientes}}
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <tr>
+                                            <th scope="row" name="id">{{id}}</th>
+                                            <td>{{nome}}</td>
+                                            <td>{{telefone}}</td>
+                                            <td>{{cpf}}</td>
+                                            <td>{{endereco}}</td>
+                                            <td><a href="/vendas/nova/cliente/{{id}}"
+                                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                                                    Selecionar
+                                                </a></td>
+                                        </tr>
+                                    </div>
+                                    </a>
+                                    {{else}}
+                                    {{/each}}
+                                </tbody>
+
+
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <script>
+
+                function atualizarTabelaClientes(clientes) {
+                    var tabela = document.getElementById("tabela-clientes");
+
+                    // Limpa a tabela existente
+                    tabela.innerHTML = "";
+
+                    // Adiciona cada cliente como uma nova linha na tabela
+                    clientes.forEach(function (cliente) {
+                        console.log('TESTE ______ ' + clientes)
+                        var linha = document.createElement("tr");
+                        linha.innerHTML = "<td>" + cliente.id + "</td>" +
+                            "<td>" + cliente.nome + "</td>" +
+                            "<td>" + cliente.telefone + "</td>" +
+                            "<td>" + cliente.cpf + "</td>" +
+                            "<td>" + cliente.endereco + "</td>" +
+                            `<td><a href='/vendas/nova/cliente/${cliente.id}'>Selecionar</a></td>`;
+                        tabela.appendChild(linha);
+                    });
+                }
+
+                /* Enviando a TAG de busca  */
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById("btn-pesquisar").addEventListener('click', function () {
+                        var valorPesquisa = document.getElementById('barra-pesquisa').value
+                        fetch('/clientes/venda?pesquisa=' + valorPesquisa)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data)
+                                atualizarTabelaClientes(data)
+                            })
+                    })
+                })
+            </script>

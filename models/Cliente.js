@@ -12,6 +12,7 @@ class Cliente extends Model{
             numero: DataTypes.STRING,
             cep: DataTypes.STRING,
             bairro: DataTypes.STRING,
+            cidade: DataTypes.STRING,
             complemento: DataTypes.STRING,
             uf: DataTypes.STRING
         }, {

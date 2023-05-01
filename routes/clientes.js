@@ -145,6 +145,7 @@ router.post('/edit', async (req, res) => {
             endereco: req.body.endereco,
             numero: req.body.numero,
             bairro: req.body.bairro,
+            complemento: req.body.complemento,
             cidade: req.body.cidade,
             cep: req.body.cep,
             uf: req.body.estado
@@ -179,17 +180,12 @@ router.post('/pesquisa', async (req, res) => {
     }
 })
 
-app.get('/venda', function (req, res) {
+router.get('/venda', async (req, res) =>{
     // Consulta o banco de dados ou outra fonte de dados
-    var cliente = {
-        id: 1,
-        nome: 'Fulano de Tal',
-        telefone: '1234567890',
-        cpf: '123.456.789-00',
-        endereco: 'Rua Tal, 123'
-    };
-
-    // Renderiza o template Handlebars com os dados do cliente
-    res.render('modal-cliente', {cliente: cliente});
+    const PesquisarClientes = await Cliente.findAll({where: Sequelize.literal(`CONCAT_WS(' ', id, nome, sobrenome, telefone, cpf, email) LIKE '%${req.query.pesquisa}%'`) }) 
+    //Enviado dados como resposta da requisição
+    const ResultadoJSON = PesquisarClientes.map(cliente => cliente.toJSON())
+    console.log(ResultadoJSON)
+    res.json(ResultadoJSON)
 });
 module.exports = router
