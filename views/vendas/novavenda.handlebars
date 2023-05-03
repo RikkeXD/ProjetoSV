@@ -119,15 +119,35 @@
                                 <span class="input-group-text" id="basic-addon2">x</span>
                             </div>
                         </div>
-                        <div class="col col-lg-2">
-                            <div class="input-group mb-3">
-                                <input type="number" class="form-control" placeholder="Parcela"
-                                    aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                <span class="input-group-text" id="basic-addon2">x</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var verificacao = false
+                        var LinhaParcela = null
+                        var total = document.getElementById('total')
+
+                        document.getElementById('pagamento').addEventListener('change', function () {
+                            var pagamento = document.getElementById('pagamento').value
+                            if (pagamento == 1 && verificacao == false) {
+                                LinhaParcela = document.createElement('tr')
+                                var celulaParcela = document.createElement('th')
+                                celulaParcela.textContent = "VALOR"
+
+                                LinhaParcela.appendChild(celulaParcela)
+                                total.appendChild(LinhaParcela)
+                                verificacao = true
+                            } else if (LinhaParcela !== null) {
+                                total.removeChild(LinhaParcela)
+                                LinhaParcela = null
+                                verificacao = false
+                            }
+                        })
+                    })
+
+                </script>
+
 
                 <!-- Forma de Envio -->
                 <div class="container">
@@ -143,8 +163,8 @@
                         <div class="col col-lg-4">
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="basic-addon1">R$</span>
-                                <input type="text" class="form-control" placeholder="Valor do envio" aria-label="Valor Envio"
-                                    aria-describedby="basic-addon1">
+                                <input type="text" class="form-control" placeholder="Valor do envio"
+                                    aria-label="Valor Envio" aria-describedby="basic-addon1">
                             </div>
                         </div>
                     </div>
@@ -162,7 +182,12 @@
                     </thead>
                     <tbody id="produtos">
                     </tbody>
-                    <tfoot>
+                    <tfoot id="total">
+                        <tr>
+                            <th colspan="3" class="text-right">Total:</th>
+                            <th id="total" data-total="0">R$ 0,00</th>
+                            <th></th>
+                        </tr>
                         <tr>
                             <th colspan="3" class="text-right">Total:</th>
                             <th id="total" data-total="0">R$ 0,00</th>
