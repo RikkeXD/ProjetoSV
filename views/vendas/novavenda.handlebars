@@ -115,7 +115,7 @@
                         <div class="col col-lg-2">
                             <div class="input-group mb-3">
                                 <input type="number" class="form-control" placeholder="Parcela"
-                                    aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                    aria-label="Recipient's username" aria-describedby="basic-addon2" id="qntdParcela">
                                 <span class="input-group-text" id="basic-addon2">x</span>
                             </div>
                         </div>
@@ -124,27 +124,51 @@
 
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
-                        var verificacao = false
-                        var LinhaParcela = null
-                        var total = document.getElementById('total')
+                        var total = document.getElementById('total');
 
                         document.getElementById('pagamento').addEventListener('change', function () {
-                            var pagamento = document.getElementById('pagamento').value
-                            if (pagamento == 1 && verificacao == false) {
-                                LinhaParcela = document.createElement('tr')
-                                var celulaParcela = document.createElement('th')
-                                celulaParcela.textContent = "VALOR"
+                            var pagamento = parseInt(this.value);
+                            var LinhaParcela = total.querySelector('.parcela');
 
-                                LinhaParcela.appendChild(celulaParcela)
-                                total.appendChild(LinhaParcela)
-                                verificacao = true
-                            } else if (LinhaParcela !== null) {
-                                total.removeChild(LinhaParcela)
-                                LinhaParcela = null
-                                verificacao = false
+                            if (pagamento === 1 && !LinhaParcela) {
+                                criarParcela(total);
+                                criarTotal(total)
+                            } else if (LinhaParcela) {
+                                removerParcela(LinhaParcela);
                             }
-                        })
-                    })
+                        });
+
+                        function criarParcela(total) {
+                            var LinhaParcela = document.createElement('tr');
+                            LinhaParcela.classList.add('parcela');
+
+                            var celulaParcela = document.createElement('th')
+                            celulaParcela.textContent = "Parcela:";
+                            celulaParcela.classList.add('text-right');
+                            celulaParcela.setAttribute('colspan', '3');
+
+                            var celulaParcela2 = document.createElement('th')
+                            celulaParcela2.textContent = 'R$ 0,00'
+                            celulaParcela2.setAttribute('id', 'totalParcela')
+                            celulaParcela2.setAttribute('data-total', '0')
+
+
+                            LinhaParcela.appendChild(celulaParcela);
+                            LinhaParcela.appendChild(celulaParcela2)
+                            total.appendChild(LinhaParcela);
+                        }
+                        function criarTotal(total) {
+                            const LinhaParcela = document.createElement('tr')
+                            const celulaParcela = document.createElement('th')
+                            celulaParcela.textContent = 'R$ 0,00'
+                            LinhaParcela.setAttribute('id', 'totalParcela')
+                            LinhaParcela.appendChild(celulaParcela)
+                            total.appendChild(LinhaParcela)
+                        }
+                        function removerParcela(LinhaParcela) {
+                            LinhaParcela.remove();
+                        }
+                    });
 
                 </script>
 
@@ -188,11 +212,6 @@
                             <th id="total" data-total="0">R$ 0,00</th>
                             <th></th>
                         </tr>
-                        <tr>
-                            <th colspan="3" class="text-right">Total:</th>
-                            <th id="total" data-total="0">R$ 0,00</th>
-                            <th></th>
-                        </tr>
                     </tfoot>
                 </table>
 
@@ -209,7 +228,6 @@
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
             <script
                 src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-
             <!--JS-->
             <script>
                 const nome = document.querySelector("#nome");
@@ -281,6 +299,10 @@
                     }
                     total.dataset.total = totalProdutos.toFixed(2);
                     total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+
+                    // Calculando a Parcela
+                    
+
                 });
             </script>
 
