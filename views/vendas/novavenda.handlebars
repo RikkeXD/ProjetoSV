@@ -124,15 +124,35 @@
 
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
-                        var total = document.getElementById('total');
+                        var total = document.getElementById('LinhaTotal');
+                        var pagamento = document.getElementById('pagamento')
 
-                        document.getElementById('pagamento').addEventListener('change', function () {
+                        function AtualizarParcela() {
+                            if (pagamento.value == 1) {
+                                var QntdParcela = document.getElementById('qntdParcela').value
+                                if (QntdParcela > 0) {
+                                    var Elementototal = document.getElementById('total')
+                                    var valorTotal = Elementototal.getAttribute('data-total')
+                                    var VlrParcela = valorTotal / QntdParcela
+                                    var Parcela = document.getElementById('totalParcela')
+                                    Parcela.textContent = `R$ ${VlrParcela.toFixed(2).replace('.', ',')}`
+                                }
+
+                            }
+                        }
+
+                        document.getElementById('qntdParcela').addEventListener('blur', function () {
+                            AtualizarParcela()
+                        })
+                        pagamento.addEventListener('change', function () {
                             var pagamento = parseInt(this.value);
                             var LinhaParcela = total.querySelector('.parcela');
 
                             if (pagamento === 1 && !LinhaParcela) {
                                 criarParcela(total);
+                                AtualizarParcela()
                                 criarTotal(total)
+
                             } else if (LinhaParcela) {
                                 removerParcela(LinhaParcela);
                             }
@@ -157,14 +177,7 @@
                             LinhaParcela.appendChild(celulaParcela2)
                             total.appendChild(LinhaParcela);
                         }
-                        function criarTotal(total) {
-                            const LinhaParcela = document.createElement('tr')
-                            const celulaParcela = document.createElement('th')
-                            celulaParcela.textContent = 'R$ 0,00'
-                            LinhaParcela.setAttribute('id', 'totalParcela')
-                            LinhaParcela.appendChild(celulaParcela)
-                            total.appendChild(LinhaParcela)
-                        }
+
                         function removerParcela(LinhaParcela) {
                             LinhaParcela.remove();
                         }
@@ -206,7 +219,7 @@
                     </thead>
                     <tbody id="produtos">
                     </tbody>
-                    <tfoot id="total">
+                    <tfoot id="LinhaTotal">
                         <tr>
                             <th colspan="3" class="text-right">Total:</th>
                             <th id="total" data-total="0">R$ 0,00</th>
@@ -272,6 +285,10 @@
                         }
                         total.dataset.total = totalProdutos.toFixed(2);
                         total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+
+                        var VlrParcela = totalProdutos / QntdParcela
+                        Parcela.textContent = `R$ ${VlrParcela.toFixed(2).replace('.', ',')}`
+                        AtualizarParcela()
                     });
                     excluirCelula.appendChild(excluirBtn);
 
@@ -300,10 +317,9 @@
                     total.dataset.total = totalProdutos.toFixed(2);
                     total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
 
-                    // Calculando a Parcela
-                    
-
                 });
+
+
             </script>
 
             <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
