@@ -7,6 +7,7 @@
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalCliente">Buscar
             cliente</button>
 
+
         {{#if cliente}}
         <div class="row">
             <div class="col">
@@ -72,6 +73,7 @@
         <!-- Formulário HTML para adicionar um novo produto -->
         <div class="container">
             <h2 class="my-4">Adicionar Produto</h2>
+            <div id="notification"></div>
             <div class="form-row">
                 <div class="form-group col-md-3">
                     <label for="produto">Produto:</label>
@@ -123,66 +125,7 @@
                 </div>
 
                 <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        var total = document.getElementById('LinhaTotal');
-                        var pagamento = document.getElementById('pagamento')
-
-                        function AtualizarParcela() {
-                            if (pagamento.value == 1) {
-                                var QntdParcela = document.getElementById('qntdParcela').value
-                                if (QntdParcela > 0) {
-                                    var Elementototal = document.getElementById('total')
-                                    var valorTotal = Elementototal.getAttribute('data-total')
-                                    var VlrParcela = valorTotal / QntdParcela
-                                    var Parcela = document.getElementById('totalParcela')
-                                    Parcela.textContent = `R$ ${VlrParcela.toFixed(2).replace('.', ',')}`
-                                }
-
-                            }
-                        }
-
-                        document.getElementById('qntdParcela').addEventListener('blur', function () {
-                            AtualizarParcela()
-                        })
-                        pagamento.addEventListener('change', function () {
-                            var pagamento = parseInt(this.value);
-                            var LinhaParcela = total.querySelector('.parcela');
-
-                            if (pagamento === 1 && !LinhaParcela) {
-                                criarParcela(total);
-                                AtualizarParcela()
-                                criarTotal(total)
-
-                            } else if (LinhaParcela) {
-                                removerParcela(LinhaParcela);
-                            }
-                        });
-
-                        function criarParcela(total) {
-                            var LinhaParcela = document.createElement('tr');
-                            LinhaParcela.classList.add('parcela');
-
-                            var celulaParcela = document.createElement('th')
-                            celulaParcela.textContent = "Parcela:";
-                            celulaParcela.classList.add('text-right');
-                            celulaParcela.setAttribute('colspan', '3');
-
-                            var celulaParcela2 = document.createElement('th')
-                            celulaParcela2.textContent = 'R$ 0,00'
-                            celulaParcela2.setAttribute('id', 'totalParcela')
-                            celulaParcela2.setAttribute('data-total', '0')
-
-
-                            LinhaParcela.appendChild(celulaParcela);
-                            LinhaParcela.appendChild(celulaParcela2)
-                            total.appendChild(LinhaParcela);
-                        }
-
-                        function removerParcela(LinhaParcela) {
-                            LinhaParcela.remove();
-                        }
-                    });
-
+                    
                 </script>
 
 
@@ -239,96 +182,11 @@
             <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-            <script
-                src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-            <!--JS-->
-            <script>
-                const nome = document.querySelector("#nome");
-                const quantidade = document.querySelector("#quantidade");
-                const valor = document.querySelector("#valor");
-                const adicionarBtn = document.querySelector("#adicionar");
-                const produtosTbody = document.querySelector("#produtos");
-                const total = document.querySelector("#total");
-
-                // Adiciona evento de clique ao botão Adicionar
-                adicionarBtn.addEventListener("click", () => {
-                    // Cria uma nova linha para a tabela
-                    const linha = document.createElement("tr");
-
-                    // Cria as células da linha com os valores dos inputs
-                    const nomeCelula = document.createElement("td");
-                    nomeCelula.textContent = nome.value;
-
-                    const quantidadeCelula = document.createElement("td");
-                    quantidadeCelula.textContent = quantidade.value;
-
-                    const valorCelula = document.createElement("td");
-                    valorCelula.textContent = `R$ ${valor.value}`;
-
-                    const totalCelula = document.createElement("td");
-                    totalCelula.textContent = `R$ ${(quantidade.value * valor.value.replace(",", ".")).toFixed(2).replace(".", ",")}`;
-
-                    const excluirCelula = document.createElement("td");
-                    const excluirBtn = document.createElement("button");
-                    excluirBtn.classList.add("btn", "btn-danger");
-                    excluirBtn.textContent = "Excluir";
-                    excluirBtn.addEventListener("click", () => {
-                        // Remove a linha da tabela
-                        produtosTbody.removeChild(linha);
-
-                        // Recalcula o valor total
-                        const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
-                        let totalProdutos = 0;
-                        for (let i = 0; i < valoresLinhas.length; i++) {
-                            const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
-                            totalProdutos += valorProduto;
-                        }
-                        total.dataset.total = totalProdutos.toFixed(2);
-                        total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
-
-                        var VlrParcela = totalProdutos / QntdParcela
-                        Parcela.textContent = `R$ ${VlrParcela.toFixed(2).replace('.', ',')}`
-                        AtualizarParcela()
-                    });
-                    excluirCelula.appendChild(excluirBtn);
-
-                    // Adiciona as células na linha
-                    linha.appendChild(nomeCelula);
-                    linha.appendChild(quantidadeCelula);
-                    linha.appendChild(valorCelula);
-                    linha.appendChild(totalCelula);
-                    linha.appendChild(excluirCelula);
-
-                    // Adiciona a linha na tabela
-                    produtosTbody.appendChild(linha);
-
-                    // Limpa os campos de entrada de dados
-                    nome.value = "";
-                    quantidade.value = 1;
-                    valor.value = "0,00";
-
-                    // Recalcula o valor total
-                    const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
-                    let totalProdutos = 0;
-                    for (let i = 0; i < valoresLinhas.length; i++) {
-                        const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
-                        totalProdutos += valorProduto;
-                    }
-                    total.dataset.total = totalProdutos.toFixed(2);
-                    total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
-
-                });
-
-
-            </script>
-
-            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"
-                integrity="sha384-oyYfs2AVtLEs0s+4dCGbGpNR7P0o0KvbxIk9ZB1JY4Q2+aCpeblsKz8t4mtePKpD"
-                crossorigin="anonymous"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"
-                integrity="sha384-lv9XK/+PpC5V6U+E1gciu2Qz5q3sz3B7bkjlBxOveVXuzZ+EYIUdhfKFsb0h0hqz"
-                crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+    
+            
+            
+            
 
             <!-- XXXX_____________________SELEÇÃO DE PRODUTOS________________________XXXX -->
 
@@ -404,6 +262,160 @@
 
             <script>
 
+                //Adicionando Produtos
+                const nome = document.querySelector("#nome");
+                const quantidade = document.querySelector("#quantidade");
+                const valor = document.querySelector("#valor");
+                const adicionarBtn = document.querySelector("#adicionar");
+                const produtosTbody = document.querySelector("#produtos");
+                const total = document.querySelector("#total");
+                const notification = document.getElementById('notification')
+
+                // Adiciona evento de clique ao botão Adicionar
+                adicionarBtn.addEventListener("click", () => {
+
+                    if (!nome.value || typeof nome.value == undefined || nome.value == null) {
+                        notification.innerHTML = '<div class="alert alert-danger">O campo do produto está vazio!</div>' 
+                    }
+                    else if(quantidade.value <= 0){
+                        notification.innerHTML = '<div class="alert alert-danger">Quantidade Incorreta!</div>'
+                    }else if(valor.value < 0){
+                        notification.innerHTML = '<div class="alert alert-danger">Valor Incorreta!</div>'
+                    }else {
+                        notification.innerHTML = ''
+
+                         //Cria uma nova linha para a tabela
+
+                        const linha = document.createElement("tr");
+
+                        // Cria as células da linha com os valores dos inputs
+                        const nomeCelula = document.createElement("td");
+                        nomeCelula.textContent = nome.value;
+
+                        const quantidadeCelula = document.createElement("td");
+                        quantidadeCelula.textContent = quantidade.value;
+
+                        const valorCelula = document.createElement("td");
+                        valorCelula.textContent = `R$ ${valor.value}`;
+
+                        const totalCelula = document.createElement("td");
+                        totalCelula.textContent = `R$ ${(quantidade.value * valor.value.replace(",", ".")).toFixed(2).replace(".", ",")}`;
+
+                        const excluirCelula = document.createElement("td");
+                        const excluirBtn = document.createElement("button");
+                        excluirBtn.classList.add("btn", "btn-danger");
+                        excluirBtn.textContent = "Excluir";
+                        excluirBtn.addEventListener("click", () => {
+                            // Remove a linha da tabela
+                            produtosTbody.removeChild(linha);
+
+                            // Recalcula o valor total
+                            const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
+                            let totalProdutos = 0;
+                            for (let i = 0; i < valoresLinhas.length; i++) {
+                                const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
+                                totalProdutos += valorProduto;
+                            }
+                            total.dataset.total = totalProdutos.toFixed(2);
+                            total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+
+                            AtualizarParcela()
+                        });
+                        excluirCelula.appendChild(excluirBtn);
+
+                        // Adiciona as células na linha
+                        linha.appendChild(nomeCelula);
+                        linha.appendChild(quantidadeCelula);
+                        linha.appendChild(valorCelula);
+                        linha.appendChild(totalCelula);
+                        linha.appendChild(excluirCelula);
+
+                        // Adiciona a linha na tabela
+                        produtosTbody.appendChild(linha);
+
+                        // Limpa os campos de entrada de dados
+                        nome.value = "";
+                        quantidade.value = 1;
+                        valor.value = "0,00";
+
+                        // Recalcula o valor total
+                        const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
+                        let totalProdutos = 0;
+                        for (let i = 0; i < valoresLinhas.length; i++) {
+                            const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
+                            totalProdutos += valorProduto;
+                        }
+                        total.dataset.total = totalProdutos.toFixed(2);
+                        total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+                    }
+                });
+
+
+                //Forma de pagamento
+
+                document.addEventListener('DOMContentLoaded', function () {
+                        var total = document.getElementById('LinhaTotal');
+                        var pagamento = document.getElementById('pagamento')
+
+                        function AtualizarParcela() {
+                            if (pagamento.value == 1) {
+                                var QntdParcela = document.getElementById('qntdParcela').value
+                                if (QntdParcela > 0) {
+                                    var Elementototal = document.getElementById('total')
+                                    var valorTotal = Elementototal.getAttribute('data-total')
+                                    var VlrParcela = valorTotal / QntdParcela
+                                    var Parcela = document.getElementById('totalParcela')
+                                    Parcela.textContent = `R$ ${VlrParcela.toFixed(2).replace('.', ',')}`
+                                }
+
+                            }
+                        }
+
+                        document.getElementById('qntdParcela').addEventListener('blur', function () {
+                            AtualizarParcela()
+                        })
+                        pagamento.addEventListener('change', function () {
+                            var pagamento = parseInt(this.value);
+                            var LinhaParcela = total.querySelector('.parcela');
+
+                            if (pagamento === 1 && !LinhaParcela) {
+                                criarParcela(total);
+                                AtualizarParcela()
+                                criarTotal(total)
+
+                            } else if (LinhaParcela) {
+                                removerParcela(LinhaParcela);
+                            }
+                        });
+
+                        function criarParcela(total) {
+                            var LinhaParcela = document.createElement('tr');
+                            LinhaParcela.classList.add('parcela');
+
+                            var celulaParcela = document.createElement('th')
+                            celulaParcela.textContent = "Parcela:";
+                            celulaParcela.classList.add('text-right');
+                            celulaParcela.setAttribute('colspan', '3');
+
+                            var celulaParcela2 = document.createElement('th')
+                            celulaParcela2.textContent = 'R$ 0,00'
+                            celulaParcela2.setAttribute('id', 'totalParcela')
+                            celulaParcela2.setAttribute('data-total', '0')
+
+
+                            LinhaParcela.appendChild(celulaParcela);
+                            LinhaParcela.appendChild(celulaParcela2)
+                            total.appendChild(LinhaParcela);
+                        }
+
+                        function removerParcela(LinhaParcela) {
+                            LinhaParcela.remove();
+                        }
+                    });
+
+
+
+                //Atualizando a tabela Clientes
                 function atualizarTabelaClientes(clientes) {
                     var tabela = document.getElementById("tabela-clientes");
 
@@ -424,7 +436,7 @@
                     });
                 }
 
-                /* Enviando a TAG de busca  */
+                /* Enviando a TAG de busca para o Back-End */
                 document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById("btn-pesquisar").addEventListener('click', function () {
                         var valorPesquisa = document.getElementById('barra-pesquisa').value
