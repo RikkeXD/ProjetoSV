@@ -117,7 +117,7 @@
                         <div class="col col-lg-2">
                             <div class="input-group mb-3">
                                 <input type="number" class="form-control" placeholder="Parcela"
-                                    aria-label="Recipient's username" aria-describedby="basic-addon2" id="qntdParcela">
+                                    aria-label="Recipient's username" aria-describedby="basic-addon2" id="qntdParcela" disabled>
                                 <span class="input-group-text" id="basic-addon2">x</span>
                             </div>
                         </div>
@@ -194,12 +194,6 @@
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
             <script
                 src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-
-
-
-
-
-            <!-- XXXX_____________________SELEÇÃO DE PRODUTOS________________________XXXX -->
 
             {{else}}
             {{/if}}
@@ -278,20 +272,6 @@
             </style>
 
             <script>
-
-
-                //FRETE 
-                document.addEventListener('DOMContentLoaded', function () {
-                    document.getElementById('add-frete').addEventListener('click', function () {
-
-                        const vlrFrete = document.getElementById('VlrFrete').value
-                        const frete = document.getElementById('frete')
-                        frete.textContent = `R$ ${vlrFrete.toFixed(2).replace('.', ',')}`
-                    })
-                })
-
-
-
                 //Forma de pagamento
 
                 function AtualizarParcela() {
@@ -311,10 +291,10 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     var total = document.getElementById('LinhaTotal');
                     var pagamento = document.getElementById('pagamento')
+                    var qntdParcela = document.getElementById('qntdParcela')
 
-
-
-                    document.getElementById('qntdParcela').addEventListener('blur', function () {
+                    
+                    qntdParcela.addEventListener('blur', function () {
                         AtualizarParcela()
                     })
                     pagamento.addEventListener('change', function () {
@@ -322,12 +302,14 @@
                         var LinhaParcela = total.querySelector('.parcela');
 
                         if (pagamento === 1 && !LinhaParcela) {
+                            qntdParcela.disabled = false
                             criarParcela(total);
                             AtualizarParcela()
                             criarTotal(total)
 
                         } else if (LinhaParcela) {
                             removerParcela(LinhaParcela);
+                            qntdParcela.disabled = true
                         }
                     });
 
@@ -366,6 +348,21 @@
                 const total = document.querySelector("#total");
                 const notification = document.getElementById('notification')
                 const frete = document.getElementById('frete')
+
+                function recalcular() {
+                    const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
+                    const freteElement = document.getElementById('frete')
+                    const valorFrete = freteElement.dataset.frete
+                    const FreteInteiro = parseFloat(valorFrete)
+                    let totalProdutos = 0;
+                    totalProdutos += FreteInteiro
+                    for (let i = 0; i < valoresLinhas.length; i++) {
+                        const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
+                        totalProdutos += valorProduto + totalProdutos
+                    }
+                    total.dataset.total = totalProdutos.toFixed(2);
+                    total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+                }
 
                 // Adiciona evento de clique ao botão Adicionar
                 adicionarBtn.addEventListener("click", () => {
@@ -406,16 +403,9 @@
                             produtosTbody.removeChild(linha);
 
                             // Recalcula o valor total
-                            const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
-                            let totalProdutos = 0;
-                            for (let i = 0; i < valoresLinhas.length; i++) {
-                                const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
-                                totalProdutos += valorProduto;
-                            }
-                            total.dataset.total = totalProdutos.toFixed(2);
-                            total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
-
+                            recalcular()
                             AtualizarParcela()
+
                         });
                         excluirCelula.appendChild(excluirBtn);
 
@@ -435,18 +425,28 @@
                         valor.value = "0,00";
 
                         // Recalcula o valor total
-                        const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
-                        let totalProdutos = 0;
-                        for (let i = 0; i < valoresLinhas.length; i++) {
-                            const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
-                            totalProdutos += valorProduto;
-                        }
-                        total.dataset.total = totalProdutos.toFixed(2);
-                        total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+                        recalcular()
                         AtualizarParcela()
+
+
                     }
                 });
 
+
+
+                //FRETE 
+                document.getElementById('add-frete').addEventListener('click', () =>{
+                    AdicionarFrete()
+                })
+                function AdicionarFrete() {
+                        const vlrFreteInput = document.getElementById('VlrFrete')
+                        const vlrFrete = parseFloat(vlrFreteInput.value.replace(',', '.'))
+                        document.getElementById('frete').setAttribute('data-frete', vlrFrete);
+                        const frete = document.getElementById('frete')
+                        frete.textContent = `R$ ${vlrFrete.toFixed(2).replace('.', ',')}`
+                        recalcular()
+                        AtualizarParcela()
+                }
 
 
 
