@@ -125,7 +125,7 @@
                 </div>
 
                 <script>
-                    
+
                 </script>
 
 
@@ -140,16 +140,21 @@
                                 <option value="3">Motoboy</option>
                             </select>
                         </div>
+
                         <div class="col col-lg-4">
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="basic-addon1">R$</span>
                                 <input type="text" class="form-control" placeholder="Valor do envio"
-                                    aria-label="Valor Envio" aria-describedby="basic-addon1">
+                                    aria-label="Valor Envio" aria-describedby="basic-addon1" id="VlrFrete">
                             </div>
+                        </div>
+                        <div class="col col-lg-2">
+                            <button type="button" class="btn btn-secondary" id="add-frete">Adicionar Frete</button>
                         </div>
                     </div>
                 </div>
 
+                <!--LISTA DE PRODUTOS-->
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -163,6 +168,11 @@
                     <tbody id="produtos">
                     </tbody>
                     <tfoot id="LinhaTotal">
+                        <tr>
+                            <th colspan="3" class="text-right">Frete:</th>
+                            <th id="frete" data-frete="0">R$ 0,00</th>
+                            <th></th>
+                        </tr>
                         <tr>
                             <th colspan="3" class="text-right">Total:</th>
                             <th id="total" data-total="0">R$ 0,00</th>
@@ -182,11 +192,12 @@
             <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-    
-            
-            
-            
+            <script
+                src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+
+
+
+
 
             <!-- XXXX_____________________SELEÇÃO DE PRODUTOS________________________XXXX -->
 
@@ -260,7 +271,91 @@
             </div>
 
 
+            <style>
+                #LinhaTotal tr:first-child {
+                    order: -1;
+                }
+            </style>
+
             <script>
+
+
+                //FRETE 
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById('add-frete').addEventListener('click', function () {
+
+                        const vlrFrete = document.getElementById('VlrFrete').value
+                        const frete = document.getElementById('frete')
+                        frete.textContent = `R$ ${vlrFrete.toFixed(2).replace('.', ',')}`
+                    })
+                })
+
+
+
+                //Forma de pagamento
+
+                function AtualizarParcela() {
+                    if (pagamento.value == 1) {
+                        var QntdParcela = document.getElementById('qntdParcela').value
+                        if (QntdParcela > 0) {
+                            var Elementototal = document.getElementById('total')
+                            var valorTotal = Elementototal.getAttribute('data-total')
+                            var VlrParcela = valorTotal / QntdParcela
+                            var Parcela = document.getElementById('totalParcela')
+                            Parcela.textContent = `R$ ${VlrParcela.toFixed(2).replace('.', ',')}`
+                        }
+
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    var total = document.getElementById('LinhaTotal');
+                    var pagamento = document.getElementById('pagamento')
+
+
+
+                    document.getElementById('qntdParcela').addEventListener('blur', function () {
+                        AtualizarParcela()
+                    })
+                    pagamento.addEventListener('change', function () {
+                        var pagamento = parseInt(this.value);
+                        var LinhaParcela = total.querySelector('.parcela');
+
+                        if (pagamento === 1 && !LinhaParcela) {
+                            criarParcela(total);
+                            AtualizarParcela()
+                            criarTotal(total)
+
+                        } else if (LinhaParcela) {
+                            removerParcela(LinhaParcela);
+                        }
+                    });
+
+                    function criarParcela(total) {
+                        var LinhaParcela = document.createElement('tr');
+                        LinhaParcela.classList.add('parcela');
+
+                        var celulaParcela = document.createElement('th')
+                        celulaParcela.textContent = "Parcela:";
+                        celulaParcela.classList.add('text-right');
+                        celulaParcela.setAttribute('colspan', '3');
+
+                        var celulaParcela2 = document.createElement('th')
+                        celulaParcela2.textContent = 'R$ 0,00'
+                        celulaParcela2.setAttribute('id', 'totalParcela')
+                        celulaParcela2.setAttribute('data-total', '0')
+
+
+                        LinhaParcela.appendChild(celulaParcela);
+                        LinhaParcela.appendChild(celulaParcela2)
+                        //total.appendChild(LinhaParcela);
+                        total.insertBefore(LinhaParcela, total.lastElementChild);
+                    }
+
+                    function removerParcela(LinhaParcela) {
+                        LinhaParcela.remove();
+                    }
+                });
 
                 //Adicionando Produtos
                 const nome = document.querySelector("#nome");
@@ -270,21 +365,22 @@
                 const produtosTbody = document.querySelector("#produtos");
                 const total = document.querySelector("#total");
                 const notification = document.getElementById('notification')
+                const frete = document.getElementById('frete')
 
                 // Adiciona evento de clique ao botão Adicionar
                 adicionarBtn.addEventListener("click", () => {
 
                     if (!nome.value || typeof nome.value == undefined || nome.value == null) {
-                        notification.innerHTML = '<div class="alert alert-danger">O campo do produto está vazio!</div>' 
+                        notification.innerHTML = '<div class="alert alert-danger">O campo do produto está vazio!</div>'
                     }
-                    else if(quantidade.value <= 0){
+                    else if (quantidade.value <= 0) {
                         notification.innerHTML = '<div class="alert alert-danger">Quantidade Incorreta!</div>'
-                    }else if(valor.value < 0){
+                    } else if (valor.value < 0) {
                         notification.innerHTML = '<div class="alert alert-danger">Valor Incorreta!</div>'
-                    }else {
+                    } else {
                         notification.innerHTML = ''
 
-                         //Cria uma nova linha para a tabela
+                        //Cria uma nova linha para a tabela
 
                         const linha = document.createElement("tr");
 
@@ -347,71 +443,12 @@
                         }
                         total.dataset.total = totalProdutos.toFixed(2);
                         total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
+                        AtualizarParcela()
                     }
                 });
 
 
-                //Forma de pagamento
 
-                document.addEventListener('DOMContentLoaded', function () {
-                        var total = document.getElementById('LinhaTotal');
-                        var pagamento = document.getElementById('pagamento')
-
-                        function AtualizarParcela() {
-                            if (pagamento.value == 1) {
-                                var QntdParcela = document.getElementById('qntdParcela').value
-                                if (QntdParcela > 0) {
-                                    var Elementototal = document.getElementById('total')
-                                    var valorTotal = Elementototal.getAttribute('data-total')
-                                    var VlrParcela = valorTotal / QntdParcela
-                                    var Parcela = document.getElementById('totalParcela')
-                                    Parcela.textContent = `R$ ${VlrParcela.toFixed(2).replace('.', ',')}`
-                                }
-
-                            }
-                        }
-
-                        document.getElementById('qntdParcela').addEventListener('blur', function () {
-                            AtualizarParcela()
-                        })
-                        pagamento.addEventListener('change', function () {
-                            var pagamento = parseInt(this.value);
-                            var LinhaParcela = total.querySelector('.parcela');
-
-                            if (pagamento === 1 && !LinhaParcela) {
-                                criarParcela(total);
-                                AtualizarParcela()
-                                criarTotal(total)
-
-                            } else if (LinhaParcela) {
-                                removerParcela(LinhaParcela);
-                            }
-                        });
-
-                        function criarParcela(total) {
-                            var LinhaParcela = document.createElement('tr');
-                            LinhaParcela.classList.add('parcela');
-
-                            var celulaParcela = document.createElement('th')
-                            celulaParcela.textContent = "Parcela:";
-                            celulaParcela.classList.add('text-right');
-                            celulaParcela.setAttribute('colspan', '3');
-
-                            var celulaParcela2 = document.createElement('th')
-                            celulaParcela2.textContent = 'R$ 0,00'
-                            celulaParcela2.setAttribute('id', 'totalParcela')
-                            celulaParcela2.setAttribute('data-total', '0')
-
-
-                            LinhaParcela.appendChild(celulaParcela);
-                            LinhaParcela.appendChild(celulaParcela2)
-                            total.appendChild(LinhaParcela);
-                        }
-
-                        function removerParcela(LinhaParcela) {
-                            LinhaParcela.remove();
-                        }
-                    });
 
 
 
