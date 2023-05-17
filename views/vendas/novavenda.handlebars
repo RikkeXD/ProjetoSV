@@ -80,7 +80,7 @@
                     <select class="selectpicker" data-live-search="true" id="nome">
                         <!-- Opções da lista suspensa -->
                         {{#each produtos}}
-                        <option>{{nome}}</option>
+                        <option value="{{id}}">{{nome}}</option>
                         {{else}}
                         {{/each}}
                     </select>
@@ -117,7 +117,8 @@
                         <div class="col col-lg-2">
                             <div class="input-group mb-3">
                                 <input type="number" class="form-control" placeholder="Parcela"
-                                    aria-label="Recipient's username" aria-describedby="basic-addon2" id="qntdParcela" disabled>
+                                    aria-label="Recipient's username" aria-describedby="basic-addon2" id="qntdParcela"
+                                    disabled>
                                 <span class="input-group-text" id="basic-addon2">x</span>
                             </div>
                         </div>
@@ -182,13 +183,33 @@
                 </table>
 
             </div>
+            <div>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Finalizar Venda</button>
+            </div>
+            <!--MODAL CONFIRMAÇÃO DE FINALIZAÇÃO DE VENDA-->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmação de venda</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Deseja Confirmar a venda ? 
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            <button type="button" class="btn btn-primary">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Arquivos CSS -->
+            <!-- IMPORTANDO BIBLIOTECAS -->
             <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
             <link rel="stylesheet"
                 href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
-
-            <!-- Arquivos JS -->
             <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -272,6 +293,7 @@
             </style>
 
             <script>
+
                 //Forma de pagamento
 
                 function AtualizarParcela() {
@@ -293,7 +315,7 @@
                     var pagamento = document.getElementById('pagamento')
                     var qntdParcela = document.getElementById('qntdParcela')
 
-                    
+
                     qntdParcela.addEventListener('blur', function () {
                         AtualizarParcela()
                     })
@@ -348,6 +370,7 @@
                 const total = document.querySelector("#total");
                 const notification = document.getElementById('notification')
                 const frete = document.getElementById('frete')
+                let ProdutosSelecionados = []
 
                 function recalcular() {
                     const valoresLinhas = produtosTbody.querySelectorAll("tr td:nth-child(4)");
@@ -358,7 +381,7 @@
                     totalProdutos += FreteInteiro
                     for (let i = 0; i < valoresLinhas.length; i++) {
                         const valorProduto = parseFloat(valoresLinhas[i].textContent.replace(",", ".").replace("R$ ", ""));
-                        totalProdutos += valorProduto + totalProdutos
+                        totalProdutos += valorProduto
                     }
                     total.dataset.total = totalProdutos.toFixed(2);
                     total.textContent = `R$ ${totalProdutos.toFixed(2).replace(".", ",")}`;
@@ -377,13 +400,26 @@
                     } else {
                         notification.innerHTML = ''
 
+                        //
+                        let ProdutosAdicionados = nome.value
+                        let nomeProduto = nome.options[nome.selectedIndex].text
+                        ProdutosSelecionados.push({
+                            id: ProdutosAdicionados,
+                            nome: nomeProduto,
+                            vlr: valor.value,
+                            qntd: quantidade.value
+                        })
+        
+                        console.log(ProdutosAdicionados)
                         //Cria uma nova linha para a tabela
 
+                        //Atribuindo o ID em cada Produto
                         const linha = document.createElement("tr");
+                        linha.setAttribute('data-id', ProdutosAdicionados)
 
                         // Cria as células da linha com os valores dos inputs
                         const nomeCelula = document.createElement("td");
-                        nomeCelula.textContent = nome.value;
+                        nomeCelula.textContent = nomeProduto;
 
                         const quantidadeCelula = document.createElement("td");
                         quantidadeCelula.textContent = quantidade.value;
@@ -400,7 +436,14 @@
                         excluirBtn.textContent = "Excluir";
                         excluirBtn.addEventListener("click", () => {
                             // Remove a linha da tabela
+                            const id = linha.getAttribute("data-id")
                             produtosTbody.removeChild(linha);
+                            
+                            //Removendo Produto do Array ProdutosSelecionados
+                            const index = ProdutosSelecionados.findIndex((produto) => produto.id === id)
+                            if (index !== -1){
+                                ProdutosSelecionados.splice(index, 1)
+                            }
 
                             // Recalcula o valor total
                             recalcular()
@@ -435,17 +478,17 @@
 
 
                 //FRETE 
-                document.getElementById('add-frete').addEventListener('click', () =>{
+                document.getElementById('add-frete').addEventListener('click', () => {
                     AdicionarFrete()
                 })
                 function AdicionarFrete() {
-                        const vlrFreteInput = document.getElementById('VlrFrete')
-                        const vlrFrete = parseFloat(vlrFreteInput.value.replace(',', '.'))
-                        document.getElementById('frete').setAttribute('data-frete', vlrFrete);
-                        const frete = document.getElementById('frete')
-                        frete.textContent = `R$ ${vlrFrete.toFixed(2).replace('.', ',')}`
-                        recalcular()
-                        AtualizarParcela()
+                    const vlrFreteInput = document.getElementById('VlrFrete')
+                    const vlrFrete = parseFloat(vlrFreteInput.value.replace(',', '.'))
+                    document.getElementById('frete').setAttribute('data-frete', vlrFrete);
+                    const frete = document.getElementById('frete')
+                    frete.textContent = `R$ ${vlrFrete.toFixed(2).replace('.', ',')}`
+                    recalcular()
+                    AtualizarParcela()
                 }
 
 
