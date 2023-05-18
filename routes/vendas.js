@@ -29,4 +29,8 @@ router.get('/nova/cliente/:id', async(req,res)=>{
     }
     
 })
+router.post('/novopedido', (req,res)=>{
+    console.log(data)
+    res.redirect('/vendas/nova')
+})
 module.exports = router

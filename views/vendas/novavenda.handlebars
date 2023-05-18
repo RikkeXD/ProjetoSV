@@ -14,6 +14,7 @@
                 <label for="">Nome:</label>
                 <input type="text" class="form-control" aria-label="First name"
                     value="{{cliente.nome}} {{cliente.sobrenome}}" disabled>
+                    <input type="hidden" value="{{cliente.id}}" name="idCliente" id="idCliente">
             </div>
             <div class="col">
                 <label for="">Telefone:</label>
@@ -200,7 +201,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                            <button type="button" class="btn btn-primary">Confirmar</button>
+                            <button type="button" class="btn btn-primary" name="confirmarVenda" id="btnConfirmarVenda">Confirmar</button>
                         </div>
                     </div>
                 </div>
@@ -403,11 +404,13 @@
                         //
                         let ProdutosAdicionados = nome.value
                         let nomeProduto = nome.options[nome.selectedIndex].text
+                        let idIndex = ProdutosAdicionados + '-' + Date.now()
                         ProdutosSelecionados.push({
                             id: ProdutosAdicionados,
                             nome: nomeProduto,
                             vlr: valor.value,
-                            qntd: quantidade.value
+                            qntd: quantidade.value,
+                            idIndex: idIndex,
                         })
         
                         console.log(ProdutosAdicionados)
@@ -415,7 +418,7 @@
 
                         //Atribuindo o ID em cada Produto
                         const linha = document.createElement("tr");
-                        linha.setAttribute('data-id', ProdutosAdicionados)
+                        linha.setAttribute('data-id', idIndex)
 
                         // Cria as células da linha com os valores dos inputs
                         const nomeCelula = document.createElement("td");
@@ -440,7 +443,8 @@
                             produtosTbody.removeChild(linha);
                             
                             //Removendo Produto do Array ProdutosSelecionados
-                            const index = ProdutosSelecionados.findIndex((produto) => produto.id === id)
+                            const index = ProdutosSelecionados.findIndex((produto) => produto.idIndex === idIndex)
+                            console.log(index)
                             if (index !== -1){
                                 ProdutosSelecionados.splice(index, 1)
                             }
@@ -491,10 +495,6 @@
                     AtualizarParcela()
                 }
 
-
-
-
-
                 //Atualizando a tabela Clientes
                 function atualizarTabelaClientes(clientes) {
                     var tabela = document.getElementById("tabela-clientes");
@@ -528,4 +528,35 @@
                             })
                     })
                 })
+
+                //Processando Venda
+                let btnConfirmarVenda = document.getElementById('btnConfirmarVenda')
+                btnConfirmarVenda.addEventListener('click', function() {
+                    const Clienteid = document.getElementById('idCliente').value
+                    const selectPagamento = document.getElementById('pagamento')
+                    const Pagamentoid = selectPagamento.value
+                    const QntdParcela = document.getElementById('qntdParcela').value
+                    const envio = document.getElementById('envio').value
+                    const freteElement = document.getElementById('frete')
+                    const VlrFrete = freteElement.dataset.frete
+                    const VlrTotal = total.dataset.total
+
+                    const data = {
+                        Clienteid,
+                        Pagamentoid,
+                        QntdParcela,
+                        envio,
+                        VlrFrete,
+                        VlrTotal,
+                        ProdutosSelecionados
+                    }
+                    console.log(data)
+                })
+                
+                axios.post('/vendas/novopedido', data).then(response => {
+                    console.log("Pedido Finalizado")
+                }).catch(error =>{
+                    console.log("Erro no Peidido"+error)
+                })
+
             </script>
