@@ -32,8 +32,8 @@ router.post('/novopedido', (req,res)=>{
 
     const Clienteid = req.body.Clienteid
     const Pagamentoid = req.body.Pagamentoid
-    const QntdParcela = req.body.QntdParcela
-    var envio = req.body.envio
+    let QntdParcela = req.body.QntdParcela
+    let envio = req.body.envio
     const VlrFrete = req.body.VlrFrete
     const VlrTotal = req.body.VlrTotal
     const ProdutosSelecionados = req.body.ProdutosSelecionados
@@ -62,9 +62,25 @@ router.post('/novopedido', (req,res)=>{
     if (!VlrTotal || typeof VlrTotal == undefined || VlrTotal == null){
         erros.push({texto: "Erro no valor total"})
     }
+    if (Pagamentoid == 1){
+        if (QntdParcela <= 0 || QntdParcela.length <= 0){
+            erros.push({texto: "Erro na quantidade de parcela"})
+        }
+    }
+    if (Pagamentoid > 1){
+        QntdParcela = 1 
+    }
 
-    
-    console.log(envio)
-    res.redirect('/vendas/nova')
+    const camposPreenchidos = ProdutosSelecionados.every((produto) => {
+        return produto.id && produto.nome && produto.vlr && produto.qntd && produto.idIndex;
+      });
+      
+      if (!camposPreenchidos) {
+        erros.push({texto: 'Erro nos produtos'})
+      }
+      erros.push({texto: "Teste de erro 001"})
+      erros.push({texto: "Teste de erro 002"})
+      erros.push({texto: "Teste de erro 003"})
+    res.status(400).json({erros: erros})
 })
 module.exports = router

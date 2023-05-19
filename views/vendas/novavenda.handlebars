@@ -109,7 +109,7 @@
                     <div class="row">
                         <div class="col">
                             <select class="form-select" aria-label="Forma de Pagamento" id="pagamento">
-                                <option selected>Selecione a forma de pagamento</option>
+                                <option disabled selected value="0">Selecione a forma de pagamento</option>
                                 <option value="1">Cartão de Credito</option>
                                 <option value="2">Cartão de Debito</option>
                                 <option value="3">Pix</option>
@@ -136,7 +136,7 @@
                     <div class="row">
                         <div class="col">
                             <select class="form-select" aria-label="Forma de envio" id="envio">
-                                <option selected>Selecione o modo do envio</option>
+                                <option disabled selected value="0">Selecione o modo do envio</option>
                                 <option value="1">SEDEX</option>
                                 <option value="2">PAC</option>
                                 <option value="3">Motoboy</option>
@@ -186,10 +186,10 @@
             </div>
             <div>
                 <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal">Finalizar Venda</button>
+                    data-bs-target="#ConfirmarVenda">Finalizar Venda</button>
             </div>
             <!--MODAL CONFIRMAÇÃO DE FINALIZAÇÃO DE VENDA-->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="ConfirmarVenda" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -301,6 +301,11 @@
 
             <script>
 
+                //Fechando MODAL
+                function fecharModal() {
+                    const modal = new bootstrap.Modal(document.getElementById('ConfirmarVenda'));
+                    modal.hide();
+                }
                 //Forma de pagamento
 
                 function AtualizarParcela() {
@@ -510,7 +515,6 @@
 
                     // Adiciona cada cliente como uma nova linha na tabela
                     clientes.forEach(function (cliente) {
-                        console.log('TESTE ______ ' + clientes)
                         var linha = document.createElement("tr");
                         linha.innerHTML = "<td>" + cliente.id + "</td>" +
                             "<td>" + cliente.nome + "</td>" +
@@ -529,20 +533,26 @@
                         fetch('/clientes/venda?pesquisa=' + valorPesquisa)
                             .then(response => response.json())
                             .then(data => {
-                                console.log(data)
                                 atualizarTabelaClientes(data)
                             })
                     })
                 })
 
+                //Verificando os dados do produto
                 function VerificarCamposPreenchidos(produtos) {
+                    if (produtos.length === 0) {
+                        return false;
+                    }
                     for (const produto of produtos) {
                         if (!produto.id || !produto.nome || !produto.vlr || !produto.qntd || !produto.idIndex) {
-                            return false
+                            return false;
                         }
                     }
-                    return true
+
+                    return true;
                 }
+
+
                 const ValidarCampos = VerificarCamposPreenchidos(ProdutosSelecionados)
                 var erros = []
 
@@ -558,30 +568,41 @@
                     const freteElement = document.getElementById('frete')
                     const VlrFrete = freteElement.dataset.frete
                     const VlrTotal = total.dataset.total
-                    
-                    console.log("Produtos ++++++++++++ "+ ProdutosSelecionados)
-                    console.log(ValidarCampos)
+
+
+                    //Verificando dados antes de enviar para o Back
                     if (!ValidarCampos) {
                         erros.push({ texto: "Erro nos produtos" })
-                    } 
-                    if (envio <= 0) {
+                    }
+                    else if (envio <= 0) {
                         erros.push({ texto: "Erro no modo de envio" })
-                    } 
-                    if (Pagamentoid <= 0) {
-                        erros.push({ texto: "Erro no modo pagamento" })
-                    } 
-                    if (Pagamentoid == 1 && QntdParcela <= 0) {
-                        erro.push({ texto: "Quantidade de parcelas incorretas" })
-                        conosle.log(Pagamentoid)
+                    }
+                    else if (Pagamentoid <= 0) {
+                        erros.push({ texto: "Erro no modo de pagamento" })
+                    }
+                    else if (Pagamentoid == 1) {
+                        if (QntdParcela <= 0 || QntdParcela.length == 0) {
+                            erros.push({ texto: "Quantidade de parcelas incorretas" })
+                        }
+                    } else {
+                        notification.innerHTML = ''
                     }
                     if (erros.length > 0) {
+                        // Fechar o modal
+                        $('#ConfirmarVenda').modal('hide');
+                        //Criando div de erro e exibindo
                         erros.forEach((erro) => {
+                            notification.innerHTML = ''
                             const divAlerta = document.createElement('div')
                             divAlerta.classList.add('alert', 'alert-danger')
                             divAlerta.textContent = erro.texto
                             notification.appendChild(divAlerta)
+                            erros = []
+
                         })
+                        
                     } else {
+                        console.log(Pagamentoid)
                         const data = {
                             Clienteid,
                             Pagamentoid,
@@ -595,7 +616,18 @@
                         axios.post('/vendas/novopedido', data).then(response => {
                             console.log("Pedido Finalizado")
                         }).catch(error => {
-                            console.log("Erro no Peidido" + error)
+                            console.log(error.response.data.erros)
+                            const erros = error.response.data.erros
+                            notification.innerHTML = ''
+                            $('#ConfirmarVenda').modal('hide');
+                            erros.forEach(erro => {
+                                const divAlerta = document.createElement('div')
+                                divAlerta.classList.add('alert', 'alert-danger')
+                                divAlerta.textContent = erro.texto
+                                notification.appendChild(divAlerta)
+
+                            })
+
                         })
                     }
 
