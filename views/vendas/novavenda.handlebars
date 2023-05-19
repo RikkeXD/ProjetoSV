@@ -14,7 +14,7 @@
                 <label for="">Nome:</label>
                 <input type="text" class="form-control" aria-label="First name"
                     value="{{cliente.nome}} {{cliente.sobrenome}}" disabled>
-                    <input type="hidden" value="{{cliente.id}}" name="idCliente" id="idCliente">
+                <input type="hidden" value="{{cliente.id}}" name="idCliente" id="idCliente">
             </div>
             <div class="col">
                 <label for="">Telefone:</label>
@@ -185,7 +185,8 @@
 
             </div>
             <div>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Finalizar Venda</button>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal">Finalizar Venda</button>
             </div>
             <!--MODAL CONFIRMAÇÃO DE FINALIZAÇÃO DE VENDA-->
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
@@ -197,25 +198,18 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            Deseja Confirmar a venda ? 
+                            Deseja Confirmar a venda ?
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                            <button type="button" class="btn btn-primary" name="confirmarVenda" id="btnConfirmarVenda">Confirmar</button>
+                            <button type="button" class="btn btn-primary" name="confirmarVenda"
+                                id="btnConfirmarVenda">Confirmar</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- IMPORTANDO BIBLIOTECAS -->
-            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-            <link rel="stylesheet"
-                href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
-            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-            <script
-                src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+
 
             {{else}}
             {{/if}}
@@ -292,6 +286,18 @@
                     order: -1;
                 }
             </style>
+
+
+            <!-- IMPORTANDO BIBLIOTECAS -->
+            <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+            <link rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+            <script
+                src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
 
             <script>
 
@@ -412,7 +418,7 @@
                             qntd: quantidade.value,
                             idIndex: idIndex,
                         })
-        
+
                         console.log(ProdutosAdicionados)
                         //Cria uma nova linha para a tabela
 
@@ -441,11 +447,11 @@
                             // Remove a linha da tabela
                             const id = linha.getAttribute("data-id")
                             produtosTbody.removeChild(linha);
-                            
+
                             //Removendo Produto do Array ProdutosSelecionados
                             const index = ProdutosSelecionados.findIndex((produto) => produto.idIndex === idIndex)
                             console.log(index)
-                            if (index !== -1){
+                            if (index !== -1) {
                                 ProdutosSelecionados.splice(index, 1)
                             }
 
@@ -529,9 +535,21 @@
                     })
                 })
 
+                function VerificarCamposPreenchidos(produtos) {
+                    for (const produto of produtos) {
+                        if (!produto.id || !produto.nome || !produto.vlr || !produto.qntd || !produto.idIndex) {
+                            return false
+                        }
+                    }
+                    return true
+                }
+                const ValidarCampos = VerificarCamposPreenchidos(ProdutosSelecionados)
+                var erros = []
+
                 //Processando Venda
                 let btnConfirmarVenda = document.getElementById('btnConfirmarVenda')
-                btnConfirmarVenda.addEventListener('click', function() {
+                btnConfirmarVenda.addEventListener('click', function () {
+                    const ValidarCampos = VerificarCamposPreenchidos(ProdutosSelecionados)
                     const Clienteid = document.getElementById('idCliente').value
                     const selectPagamento = document.getElementById('pagamento')
                     const Pagamentoid = selectPagamento.value
@@ -540,23 +558,50 @@
                     const freteElement = document.getElementById('frete')
                     const VlrFrete = freteElement.dataset.frete
                     const VlrTotal = total.dataset.total
-
-                    const data = {
-                        Clienteid,
-                        Pagamentoid,
-                        QntdParcela,
-                        envio,
-                        VlrFrete,
-                        VlrTotal,
-                        ProdutosSelecionados
+                    
+                    console.log("Produtos ++++++++++++ "+ ProdutosSelecionados)
+                    console.log(ValidarCampos)
+                    if (!ValidarCampos) {
+                        erros.push({ texto: "Erro nos produtos" })
+                    } 
+                    if (envio <= 0) {
+                        erros.push({ texto: "Erro no modo de envio" })
+                    } 
+                    if (Pagamentoid <= 0) {
+                        erros.push({ texto: "Erro no modo pagamento" })
+                    } 
+                    if (Pagamentoid == 1 && QntdParcela <= 0) {
+                        erro.push({ texto: "Quantidade de parcelas incorretas" })
+                        conosle.log(Pagamentoid)
                     }
-                    console.log(data)
+                    if (erros.length > 0) {
+                        erros.forEach((erro) => {
+                            const divAlerta = document.createElement('div')
+                            divAlerta.classList.add('alert', 'alert-danger')
+                            divAlerta.textContent = erro.texto
+                            notification.appendChild(divAlerta)
+                        })
+                    } else {
+                        const data = {
+                            Clienteid,
+                            Pagamentoid,
+                            QntdParcela,
+                            envio,
+                            VlrFrete,
+                            VlrTotal,
+                            ProdutosSelecionados
+                        }
+                        console.log(data)
+                        axios.post('/vendas/novopedido', data).then(response => {
+                            console.log("Pedido Finalizado")
+                        }).catch(error => {
+                            console.log("Erro no Peidido" + error)
+                        })
+                    }
+
+
                 })
-                
-                axios.post('/vendas/novopedido', data).then(response => {
-                    console.log("Pedido Finalizado")
-                }).catch(error =>{
-                    console.log("Erro no Peidido"+error)
-                })
+
+
 
             </script>
