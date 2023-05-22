@@ -98,4 +98,14 @@ router.post('/edit', async (req, res) => {
         })
     }
 })
+
+router.post ('/deletar/:id', async (req, res) => {
+    const ExcluirUsuarios = await Usuario.destroy({where:{id: req.params.id}}).then(()=>{
+        req.flash('success_msg', 'Usuario Deletado com Sucesso')
+        res.redirect('/usuarios')
+    }).catch((err)=> {
+        req.flash('error_msg', "Erro ao Deletar o Usuario " + err)
+        res.redirect('/usuarios')
+    })
+})
 module.exports = router

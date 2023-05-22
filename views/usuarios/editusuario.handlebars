@@ -1,5 +1,5 @@
 {{#each erro}}
-    <div class="alert alert-danger">{{texto}}</div>
+<div class="alert alert-danger">{{texto}}</div>
 {{else}}
 {{/each}}
 
@@ -11,8 +11,7 @@
                     <label for="nome" class="col-form-label">Nome</label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" name="nome" class="form-control" value="{{usuario.nome}}" aria-labelledby="nome"
-                        >
+                    <input type="text" name="nome" class="form-control" value="{{usuario.nome}}" aria-labelledby="nome">
                 </div>
                 <div class="col-auto">
                     <span id="nome" class="form-text">
@@ -26,7 +25,7 @@
                 </div>
                 <div class="col-auto">
                     <input type="text" name="sobrenome" class="form-control " aria-labelledby="sobrenome"
-                        value="{{usuario.sobrenome}}" >
+                        value="{{usuario.sobrenome}}">
                 </div>
                 <div class="col-auto">
                     <span id="sobrenome" class="form-text">
@@ -40,7 +39,7 @@
                 </div>
                 <div class="col-auto">
                     <input type="email" id="email" name="email" class="form-control " aria-labelledby="email"
-                        value="{{usuario.email}}" >
+                        value="{{usuario.email}}">
                 </div>
                 <div class="col-auto">
                     <span id="email" class="form-text">
@@ -51,7 +50,8 @@
             </div>
             <hr class="mt-5">
             <button type="submit" class="btn btn-primary mt-3">Atualizar</button>
-            <button class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#modalExcluir" type="button">Deletar</button>
+            <button class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#modalExcluir"
+                type="button">Deletar</button>
             <a href="/usuarios"><button type="button" class="btn btn-secondary mt-3">Voltar</button></a>
     </div>
 
@@ -61,21 +61,21 @@
 
 <!-- MODAL EXCLUIR -->
 <div class="modal" id="modalExcluir" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">DELETAR: {{usuario.nome}} {{usuario.sobrenome}}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>Deseja realmente excluir?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-        <form action="/usuarios/edit/{{usuario.id}}" method="post">
-        <button type="button" class="btn btn-danger">Excluir</button>
-        </form>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">DELETAR: {{usuario.nome}} {{usuario.sobrenome}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja realmente excluir?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <form action="/usuarios/deletar/{{usuario.id}}" method="post">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>

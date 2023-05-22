@@ -10,7 +10,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         primaryKey: true
       },
-      vendedorId: {
+      vendedor_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
@@ -18,7 +18,7 @@ module.exports = {
           key: 'id'
         }
       },
-      clienteId: {
+      cliente_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
@@ -26,7 +26,7 @@ module.exports = {
           key: 'id'
         }
       },
-      pagamentoId: {
+      pagamento_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
@@ -45,6 +45,16 @@ module.exports = {
       vlr_frete: {
         allowNull: true,
         type: Sequelize.FLOAT
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     })
   },

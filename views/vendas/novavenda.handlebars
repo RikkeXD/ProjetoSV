@@ -614,7 +614,8 @@
                         }
                         console.log(data)
                         axios.post('/vendas/novopedido', data).then(response => {
-                            console.log("Pedido Finalizado")
+                            $('#ConfirmarVenda').modal('hide');
+                            window.location.href = '/home';
                         }).catch(error => {
                             console.log(error.response.data.erros)
                             const erros = error.response.data.erros
@@ -625,7 +626,6 @@
                                 divAlerta.classList.add('alert', 'alert-danger')
                                 divAlerta.textContent = erro.texto
                                 notification.appendChild(divAlerta)
-
                             })
 
                         })

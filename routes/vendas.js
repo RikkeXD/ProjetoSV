@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Cliente = require('../models/Cliente')
 const Produto = require('../models/Produto')
+const Vendas = require('../models/Venda')
 
 router.get('/nova', async(req,res)=>{
     try{
@@ -27,7 +28,7 @@ router.get('/nova/cliente/:id', async(req,res)=>{
     }
     
 })
-router.post('/novopedido', (req,res)=>{
+router.post('/novopedido', async(req,res)=>{
     const data = req.body
 
     const Clienteid = req.body.Clienteid
@@ -78,9 +79,27 @@ router.post('/novopedido', (req,res)=>{
       if (!camposPreenchidos) {
         erros.push({texto: 'Erro nos produtos'})
       }
-      erros.push({texto: "Teste de erro 001"})
-      erros.push({texto: "Teste de erro 002"})
-      erros.push({texto: "Teste de erro 003"})
-    res.status(400).json({erros: erros})
+      if(erros.length > 0){
+        res.status(400).json({erros: erros})
+      }else{
+        const VendedorID = 1
+        const vendas = await Vendas.create({
+            vendedorId: VendedorID,
+            clienteId: Clienteid,
+            pagamentoID: Pagamentoid,
+            vlr_total: VlrTotal,
+            frete: envio,
+            vlr_frete: VlrFrete
+        }).then(()=>{
+            console.log("Pedido Realizado")
+            req.flash('success_msg','Pedido Realizado com sucesso')
+            res.status(200).json({mensagem: "Pedido Finalizado"})
+        }).catch((err)=>{
+            console.log(err)
+            res.status(400).json({erros: err})
+        })
+        
+      }
+    
 })
 module.exports = router

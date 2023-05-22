@@ -91,7 +91,7 @@ router.post('/delete', async(req,res)=>{
         res.redirect('/produtos')
     }).catch((err)=>{
         req.flash('error_msg', 'Erro ao deletar o produto')
-        res.redirect('/produtos') 
+        res.redirect('/produtos')
     })
 })
 module.exports = router
