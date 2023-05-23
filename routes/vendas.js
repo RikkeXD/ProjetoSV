@@ -4,6 +4,17 @@ const Cliente = require('../models/Cliente')
 const Produto = require('../models/Produto')
 const Vendas = require('../models/Venda')
 
+router.get('/', async(req,res)=>{
+    try{
+        const pedidos = await Vendas.findAll({})
+        const pedidosJSON = pedidos.map(pedido => pedido.toJSON())
+        res.render('vendas/vendas', {pedidos: pedidosJSON})
+    }catch (err){
+        console.log(err)
+        res.redirect('/home')
+    }
+})
+
 router.get('/nova', async(req,res)=>{
     try{
         const clientes = await Cliente.findAll({})
@@ -83,21 +94,25 @@ router.post('/novopedido', async(req,res)=>{
         res.status(400).json({erros: erros})
       }else{
         const VendedorID = 1
-        const vendas = await Vendas.create({
-            vendedorId: VendedorID,
-            clienteId: Clienteid,
-            pagamentoID: Pagamentoid,
-            vlr_total: VlrTotal,
-            frete: envio,
-            vlr_frete: VlrFrete
-        }).then(()=>{
-            console.log("Pedido Realizado")
-            req.flash('success_msg','Pedido Realizado com sucesso')
+        try{
+            const vendas = await Vendas.create({
+                vendedor_id: VendedorID,
+                cliente_id: Clienteid,
+                pagamento_id: Pagamentoid,
+                vlr_total: VlrTotal,
+                frete: envio,
+                vlr_frete: VlrFrete,
+            })
+            
+            const idpedido = vendas.id
+
+            req.flash('success_msg',`Pedido Realizado - Numero do Pedido: ${idpedido}`)
             res.status(200).json({mensagem: "Pedido Finalizado"})
-        }).catch((err)=>{
+        }
+        catch (err){
             console.log(err)
             res.status(400).json({erros: err})
-        })
+        }
         
       }
     

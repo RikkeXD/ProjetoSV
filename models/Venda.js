@@ -9,6 +9,8 @@ class Vendas extends Model{
             vlr_total: DataTypes.FLOAT,
             frete: DataTypes.STRING,
             vlr_frete: DataTypes.FLOAT,
+            status: DataTypes.INTEGER,
+            cod_rastreio: DataTypes.STRING,
         }, {
             sequelize
         })

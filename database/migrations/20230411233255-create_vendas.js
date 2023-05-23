@@ -46,6 +46,14 @@ module.exports = {
         allowNull: true,
         type: Sequelize.FLOAT
       },
+      status:{
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
+      cod_rastreio:{
+        allowNull: true,
+        type: Sequelize.STRING
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
