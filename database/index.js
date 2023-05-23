@@ -5,6 +5,7 @@ const Usuario = require('../models/Usuario')
 const Cliente = require('../models/Cliente')
 const Produto = require('../models/Produto')
 const Vendas = require('../models/Venda')
+const Pagamentos = require('../models/Pagamento')
 
 const connection = new Sequelize(configDB)
 
@@ -12,5 +13,6 @@ Usuario.init(connection)
 Cliente.init(connection)
 Produto.init(connection)
 Vendas.init(connection)
+Pagamentos.init(connection)
 
 module.exports = connection

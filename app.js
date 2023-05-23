@@ -11,6 +11,7 @@ const home = require('./routes/home')//Importando as Rotas do usuario
 const clientes = require('./routes/clientes') //Importando as Rotas do cliente
 const produtos = require('./routes/produtos')
 const vendas = require('./routes/vendas')
+const moment = require('moment') //Biblioteca para ajuda na formatação das Datas
 
 //Configurações
     //Banco de Dados

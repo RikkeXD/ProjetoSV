@@ -11,15 +11,17 @@
     </tr>
   </thead>
   <tbody>
-    
+    {{#each pedidos}}
     <tr>
-      <th scope="row">1</th>
-      <td>Ryan</td>
-      <td>R$ 250</td>
-      <td>Cartão de Credito</td>
-      <td>22/05/2023</td>
-      <td>Rastreio Pendente</td>
+      <th scope="row">{{id}}</th>
+      <td>{{cliente_id}}</td>
+      <td>{{vlr_total}}</td>
+      <td>{{pagamento_id}}</td>
+      <td>{{createdAt}}</td>
+      <td>{{status}}</td>
       <td><button type="button" class="btn btn-outline-info btn-sm">Consultar</button></td>
     </tr>
+    {{else}}
+    {{/each}}
   </tbody>
 </table>
