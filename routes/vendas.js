@@ -12,7 +12,7 @@ async function BuscandoNomePorId(id) {
         const nomeCliente = `${nome.nome} ${nome.sobrenome}`
         return nomeCliente
     } catch (err) {
-        console.log('ERRO NA FUNÇÃO BuscandoNomePorId')
+        console.log('ERRO NA FUNÇÃO Bus')
     }
 
 }
@@ -32,13 +32,47 @@ router.get('/', async (req, res) => {
     try {
         const pedidos = await Vendas.findAll({})
         const pedidosJSON = pedidos.map(pedido => pedido.toJSON())
-
-        const newPedidos = []
+        //console.log(pedidosJSON)
+        const TodosPedidos = []
         for (const pedido of pedidosJSON){
+
             const clienteId = pedido.cliente_id
-            console.log("Numero do Cliente >>>  " + clienteId)
+            const Pagamentoid = pedido.pagamento_id
+            const statusID = pedido.status
+            const vlr_total = pedido.vlr_total
+            var status = ''
+
+            switch (statusID){
+                case 1:
+                    status = "Envio Pendente"
+                    break
+                case 2:
+                    status = "Pedido em transporte"
+                    break
+                case 3:
+                    status = 'Pedido Entregue'
+                    break
+                default: 
+                    status = "Erro no Status do pedido"
+            }
+            
+        
+            //Formatando DATA
+            const dataBD = pedido.createdAt
+            const dataFormatada = moment(dataBD).format('DD/MM/YYYY')
+
+            console.log("DATA >> " + dataFormatada)
+            //Buscando Nome, atraves do ID e Armazenando o NOME
             const NomeCliente= await BuscandoNomePorId(clienteId)
-            NomeCliente.push(newPedidos)
+            const NomePagamento = await BuscandoPagamento(Pagamentoid)
+
+            //Inserindo no OBJ
+            TodosPedidos.push({nome: NomeCliente})
+            TodosPedidos.push({pagamento: NomePagamento})
+            TodosPedidos.push({data: dataFormatada})
+            TodosPedidos.push({status: status})
+            TodosPedidos.push({vlr_total})
+            console.log(TodosPedidos)
         }
         
         const ClienteID = pedidosJSON.map
