@@ -1,11 +1,19 @@
 'use strict';
 
+const { increment } = require('../../models/Cliente');
+
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('venda_produto', {
-      vendaId: {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        type: Sequelize.INTEGER,
+        primaryKey: true
+      },
+      venda_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references:{
@@ -13,7 +21,7 @@ module.exports = {
           key: 'id'
         }
       },
-      produtoId: {
+      produto_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references:{

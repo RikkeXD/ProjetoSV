@@ -416,13 +416,15 @@
                         let ProdutosAdicionados = nome.value
                         let nomeProduto = nome.options[nome.selectedIndex].text
                         let idIndex = ProdutosAdicionados + '-' + Date.now()
+                        let vlr_uni = parseFloat(valor.value.replace(',','.'))
                         ProdutosSelecionados.push({
                             id: ProdutosAdicionados,
                             nome: nomeProduto,
-                            vlr: valor.value,
+                            vlr: vlr_uni,
                             qntd: quantidade.value,
                             idIndex: idIndex,
                         })
+    
 
                         console.log(ProdutosAdicionados)
                         //Cria uma nova linha para a tabela
@@ -440,6 +442,7 @@
 
                         const valorCelula = document.createElement("td");
                         valorCelula.textContent = `R$ ${valor.value}`;
+                        valorCelula.setAttribute('data-vlr', valor.value.replace(',','.'))
 
                         const totalCelula = document.createElement("td");
                         totalCelula.textContent = `R$ ${(quantidade.value * valor.value.replace(",", ".")).toFixed(2).replace(".", ",")}`;

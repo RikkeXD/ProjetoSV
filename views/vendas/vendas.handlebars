@@ -14,12 +14,13 @@
     {{#each pedidos}}
     <tr>
       <th scope="row">{{id}}</th>
-      <td>{{cliente_id}}</td>
-      <td>{{vlr_total}}</td>
-      <td>{{pagamento_id}}</td>
-      <td>{{createdAt}}</td>
+      <td>{{nome}}</td>
+      <td id="vlr_total">{{vlr_total}}</td>
+      <td>{{pagamento}}</td>
+      <td>{{data}}</td>
       <td>{{status}}</td>
-      <td><button type="button" class="btn btn-outline-info btn-sm">Consultar</button></td>
+      <td> <a href="vendas/pedido/{{id}}"><button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+          data-bs-target="#modalConsulta">Consultar</button></td></a>
     </tr>
     {{else}}
     {{/each}}

@@ -4,6 +4,7 @@ const Cliente = require('../models/Cliente')
 const Produto = require('../models/Produto')
 const Vendas = require('../models/Venda')
 const Pagamentos = require('../models/Pagamento')
+const Venda_Produto = require('../models/Venda_Produto')
 const moment = require('moment')
 
 async function BuscandoNomePorId(id) {
@@ -34,15 +35,15 @@ router.get('/', async (req, res) => {
         const pedidosJSON = pedidos.map(pedido => pedido.toJSON())
         //console.log(pedidosJSON)
         const TodosPedidos = []
-        for (const pedido of pedidosJSON){
-
+        for (const pedido of pedidosJSON) {
+            const pedidoid = pedido.id
             const clienteId = pedido.cliente_id
             const Pagamentoid = pedido.pagamento_id
             const statusID = pedido.status
             const vlr_total = pedido.vlr_total
             var status = ''
 
-            switch (statusID){
+            switch (statusID) {
                 case 1:
                     status = "Envio Pendente"
                     break
@@ -52,39 +53,40 @@ router.get('/', async (req, res) => {
                 case 3:
                     status = 'Pedido Entregue'
                     break
-                default: 
+                default:
                     status = "Erro no Status do pedido"
             }
-            
-        
+
+
             //Formatando DATA
             const dataBD = pedido.createdAt
             const dataFormatada = moment(dataBD).format('DD/MM/YYYY')
 
-            console.log("DATA >> " + dataFormatada)
+            //Formatando Valor total
+            const total_formatado = `R$ ${vlr_total.toFixed(2).replace('.', ',')}`
+
+
             //Buscando Nome, atraves do ID e Armazenando o NOME
-            const NomeCliente= await BuscandoNomePorId(clienteId)
+            const NomeCliente = await BuscandoNomePorId(clienteId)
             const NomePagamento = await BuscandoPagamento(Pagamentoid)
 
             //Inserindo no OBJ
-            TodosPedidos.push({nome: NomeCliente})
-            TodosPedidos.push({pagamento: NomePagamento})
-            TodosPedidos.push({data: dataFormatada})
-            TodosPedidos.push({status: status})
-            TodosPedidos.push({vlr_total})
-            console.log(TodosPedidos)
+            TodosPedidos.push({
+                id: pedidoid,
+                nome: NomeCliente,
+                pagamento: NomePagamento,
+                data: dataFormatada,
+                status: status,
+                vlr_total: total_formatado
+            })
         }
-        
-        const ClienteID = pedidosJSON.map
-        
-        const dataBanco = '2023-05-23 11:26:58'
-        const dataFormatada = moment(dataBanco).format('DD/MM/YYYY')
 
-        
+
+
+
         const NomePagamento = await BuscandoPagamento(1)
-        console.log(dataFormatada)
         //console.log("Nome função" + NameFuction)
-        res.render('vendas/vendas', { pedidos: pedidosJSON })
+        res.render('vendas/vendas', { pedidos: TodosPedidos })
     } catch (err) {
         console.log(err)
         res.redirect('/home')
@@ -163,9 +165,15 @@ router.post('/novopedido', async (req, res) => {
         return produto.id && produto.nome && produto.vlr && produto.qntd && produto.idIndex;
     });
 
+
+
     if (!camposPreenchidos) {
         erros.push({ texto: 'Erro nos produtos' })
     }
+
+
+
+
     if (erros.length > 0) {
         res.status(400).json({ erros: erros })
     } else {
@@ -183,6 +191,23 @@ router.post('/novopedido', async (req, res) => {
 
             const idpedido = vendas.id
 
+            for (const produto of ProdutosSelecionados) {
+                const IdProduto = produto.id
+                const qntd = produto.qntd
+                const vlr_uni = produto.vlr
+
+                console.log(produto)
+
+                const produtoDB = await Venda_Produto.create({
+                    venda_id: idpedido,
+                    produto_id: IdProduto,
+                    quantidade: qntd,
+                    vlr_uni: vlr_uni
+                })
+
+
+            }
+
             req.flash('success_msg', `Pedido Realizado - Numero do Pedido: ${idpedido}`)
             res.status(200).json({ mensagem: "Pedido Finalizado" })
         }
@@ -193,5 +218,9 @@ router.post('/novopedido', async (req, res) => {
 
     }
 
+})
+
+router.get('/pedido/:id', async(req,res) =>{
+    res.render("vendas/pedido")
 })
 module.exports = router
