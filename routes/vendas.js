@@ -196,8 +196,6 @@ router.post('/novopedido', async (req, res) => {
                 const qntd = produto.qntd
                 const vlr_uni = produto.vlr
 
-                console.log(produto)
-
                 const produtoDB = await Venda_Produto.create({
                     venda_id: idpedido,
                     produto_id: IdProduto,
@@ -221,6 +219,42 @@ router.post('/novopedido', async (req, res) => {
 })
 
 router.get('/pedido/:id', async(req,res) =>{
-    res.render("vendas/pedido")
+    try {
+        var pedido = []
+        var produtos = []
+
+        const pedidoBD = await Vendas.findOne({where:{id: req.params.id}})
+        const pedidoJSON = pedidoBD.toJSON()
+
+        //Coletando informações do Usuarios
+        const clienteid = pedidoJSON.cliente_id
+        const clienteBD = await Cliente.findOne({where: {id: clienteid}})
+        const infoclientes = clienteBD.toJSON()
+
+
+        //Coletando informações de pagamento
+        const pagamentoid = pedidoJSON.pagamento_id
+        const pagamentoBD = await Pagamentos.findOne({where: {id: pagamentoid}})
+        const infopagamento = pagamentoBD.toJSON()
+        const nomepagamento = infopagamento.nome
+        
+
+        //Pegando todos os produtos do pedido
+        const produtosBD = await Venda_Produto.findAll({where: {venda_id: req.params.id}})
+        const produtosJSON = produtosBD.map(produto => produto.toJSON())
+        for (produtos of produtosJSON){
+            const NomeProduto = await Produto.findOne({where: {id: produtos.produto_id}})
+            const NomeProdutoJSON = NomeProduto.toJSON()
+            console.log(NomeProdutoJSON)
+        }
+
+
+        res.render('vendas/pedido')
+        //console.log(pedidoJSON)
+    }  catch (erro){
+        console.log("Ocorreu o seguinte erro: " + erro)
+    }   
+    
+    
 })
 module.exports = router
