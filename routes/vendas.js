@@ -221,7 +221,7 @@ router.post('/novopedido', async (req, res) => {
 router.get('/pedido/:id', async(req,res) =>{
     try {
         var pedido = []
-        var produtos = []
+        var listprodutos = []
 
         const pedidoBD = await Vendas.findOne({where:{id: req.params.id}})
         const pedidoJSON = pedidoBD.toJSON()
@@ -245,7 +245,13 @@ router.get('/pedido/:id', async(req,res) =>{
         for (produtos of produtosJSON){
             const NomeProduto = await Produto.findOne({where: {id: produtos.produto_id}})
             const NomeProdutoJSON = NomeProduto.toJSON()
-            console.log(NomeProdutoJSON)
+            const total = produtos.quantidade * produtos.vlr_uni
+            listprodutos.push({produto: NomeProdutoJSON.nome, 
+                    qntd: produtos.quantidade,
+                    vlr_uni: produtos.vlr_uni,
+                    total: total
+                })
+            console.log(pedidoJSON)
         }
 
 
