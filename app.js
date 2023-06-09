@@ -19,6 +19,15 @@ const moment = require('moment') //Biblioteca para ajuda na formatação das Dat
     //Configurando para utilizar JSON
         app.use(express.json())
     //Handlebars
+
+    handlebars.registerHelper("eq", function (a, b, options) {
+        if (a === b) {
+            return options.fn(this);
+        } else {
+            return options.inverse(this);
+        }
+    });
+
         app.engine('handlebars', handlebars.engine
         ({defaultLayout: 'main',
         helpers: {
@@ -27,8 +36,9 @@ const moment = require('moment') //Biblioteca para ajuda na formatação das Dat
             }
         }
     }))
+
         app.set('view engine', 'handlebars')
-        
+
     // Public
         app.use(express.static(path.join(__dirname,'public')))
     //Body-Parser

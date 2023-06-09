@@ -122,7 +122,7 @@ router.post('/novopedido', async (req, res) => {
 
     const Clienteid = req.body.Clienteid
     const Pagamentoid = req.body.Pagamentoid
-    let QntdParcela = req.body.QntdParcela
+    let QntdParcela = parseInt(req.body.QntdParcela)
     let envio = req.body.envio
     const VlrFrete = req.body.VlrFrete
     const VlrTotal = req.body.VlrTotal
@@ -157,6 +157,7 @@ router.post('/novopedido', async (req, res) => {
             erros.push({ texto: "Erro na quantidade de parcela" })
         }
     }
+    
     if (Pagamentoid > 1) {
         QntdParcela = 1
     }
@@ -183,6 +184,7 @@ router.post('/novopedido', async (req, res) => {
                 vendedor_id: VendedorID,
                 cliente_id: Clienteid,
                 pagamento_id: Pagamentoid,
+                qntd_parcela: QntdParcela,
                 vlr_total: VlrTotal,
                 frete: envio,
                 vlr_frete: VlrFrete,
@@ -237,7 +239,24 @@ router.get('/pedido/:id', async(req,res) =>{
         const pagamentoBD = await Pagamentos.findOne({where: {id: pagamentoid}})
         const infopagamento = pagamentoBD.toJSON()
         const nomepagamento = infopagamento.nome
+
+        //Verificando se é Parcelado para informar o Front-End
+        let vlr_parcela = null
+        if(pedidoJSON.qntd_parcela > 1 ){
+            parcela = pedidoJSON.qntd_parcela
+            vlr_parcela = pedidoJSON.vlr_total / pedidoJSON.qntd_parcela
+        }
         
+        // Criando um JSON para enviar para o Front-End
+        pedido.push({
+            numpedido: req.params.id,
+            pagamento: nomepagamento,
+            parcela: pedidoJSON.qntd_parcela,
+            frete: pedidoJSON.frete,
+            vlr_parcela: vlr_parcela ? vlr_parcela.toLocaleString('pt-BR', {style: 'currency', currency:'BRL'}) : null,
+            vlr_frete: pedidoJSON.vlr_frete.toLocaleString('pt-BR', {style: 'currency', currency:'BRL'}),
+            vlr_total: pedidoJSON.vlr_total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
+        })
 
         //Pegando todos os produtos do pedido
         const produtosBD = await Venda_Produto.findAll({where: {venda_id: req.params.id}})
@@ -248,14 +267,16 @@ router.get('/pedido/:id', async(req,res) =>{
             const total = produtos.quantidade * produtos.vlr_uni
             listprodutos.push({produto: NomeProdutoJSON.nome, 
                     qntd: produtos.quantidade,
-                    vlr_uni: produtos.vlr_uni,
-                    total: total
+                    vlr_uni: produtos.vlr_uni.toLocaleString('pt-BR', {style: 'currency', currency:'BRL'}),
+                    total: total.toLocaleString('pt-BR', {style: 'currency', currency:'BRL'})
                 })
-            console.log(pedidoJSON)
+            //console.log(totalFormatado)
+            console.log(listprodutos)
+            console.log(pedido)
         }
 
 
-        res.render('vendas/pedido')
+        res.render('vendas/pedido', {produtos: listprodutos, cliente: infoclientes, pedido: pedido, vlr_parcela: vlr_parcela})
         //console.log(pedidoJSON)
     }  catch (erro){
         console.log("Ocorreu o seguinte erro: " + erro)

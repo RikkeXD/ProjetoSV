@@ -6,6 +6,7 @@ class Vendas extends Model{
             vendedor_id: DataTypes.INTEGER,
             cliente_id: DataTypes.INTEGER,
             pagamento_id: DataTypes.INTEGER,
+            qntd_parcela: DataTypes.INTEGER,
             vlr_total: DataTypes.FLOAT,
             frete: DataTypes.STRING,
             vlr_frete: DataTypes.FLOAT,

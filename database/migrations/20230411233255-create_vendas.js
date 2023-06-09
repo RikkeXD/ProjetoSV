@@ -34,6 +34,10 @@ module.exports = {
           key: 'id'
         }
       },
+      qntd_parcela: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
       vlr_total: {
         allowNull: false,
         type: Sequelize.FLOAT

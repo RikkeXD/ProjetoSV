@@ -2,7 +2,15 @@
     <div class="card-body">
         <div class="row">
             <div class="col">
-                <h1>PEDIDO: 2</h1>
+                {{#each pedido}}
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="mr-auto">PEDIDO: {{numpedido}}</h1>
+                    {{#if (eq status 1)}}
+                        <button type="button" class="btn btn-primary">Confirmar envio</button>
+                    {{/if}}
+                </div>
+                {{else}}
+                {{/each}}
                 <hr>
             </div>
         </div>
@@ -74,35 +82,37 @@
         <hr>
 
         
-
+        {{#each pedido}}
         <div class="container my-4 d-flex flex-column">
             <h2 class="fs-4 text-center">PAGAMENTO</h2>
             <div class="row border border-black">
                 <div class="col">
                     <h3 class="d-inline fs-5">Forma de pagamento: </h3>
-                    <p class="d-inline fs-6">Cartão de Credito</p>
+                    <p class="d-inline fs-6">{{pagamento}}</p>
                 </div>
                 <div class="col">
                     <h3 class="d-inline fs-5">Parcelas: </h3>
-                    <p class="d-inline fs-6">5 X</p>
+                    <p class="d-inline fs-6">{{parcela}}X</p>
                 </div>
             </div>
         </div>
+        
         
             <div class="container my-4 d-flex flex-column">
                 <h2 class="fs-4 my-2 text-center">ENVIO</h2>
                 <div class="row border border-black ">
                     <div class="col">
                         <h3 class="d-inline fs-5">Forma de envio: </h3>
-                        <p class="d-inline fs-6">Motoboy</p>
+                        <p class="d-inline fs-6">{{frete}}</p>
                     </div>
                     <div class="col">
                         <h3 class="d-inline fs-5">Valor do Frete: </h3>
-                        <p class="d-inline fs-6">R$ 21,74</p>
+                        <p class="d-inline fs-6">{{vlr_frete}}</p>
                     </div>
                 </div>
             </div>
-        
+        {{else}}
+        {{/each}}
             <div class="row">
                 <table class="table table-bordered">
                     <thead>
@@ -114,30 +124,37 @@
                         </tr>
                     </thead>
                     <tbody id="produtos">
+                        {{#each produtos}}
                         <tr>
-                            <td>Omega 3</td>
-                            <td>5</td>
-                            <td>R$ 100</td>
-                            <td>R$ 500</td>
+                            <td>{{produto}}</td>
+                            <td>{{qntd}}</td>
+                            <td>{{vlr_uni}}</td>
+                            <td>{{total}}</td>
                         </tr>
-                        <tr>
-                            <td>Risotex</td>
-                            <td>15</td>
-                            <td>R$ 50</td>
-                            <td>R$ 600</td>
-                        </tr>
+                        {{else}}
+                        {{/each}}
                     </tbody>
                     <tfoot id="LinhaTotal">
                         <tr>
+                            {{#each pedido}}
                             <th colspan="3" class="text-right">Frete:</th>
-                            <th id="frete" data-frete="0">R$ 0,00</th>
+                            <th id="frete" data-frete="0">{{vlr_frete}}</th>
                             <th></th>
                         </tr>
+                        {{#if vlr_parcela}}
+                        <tr>
+                            <th class="text-right" colspan="3">Parcela:</th>
+                            <th>{{vlr_parcela}}</th>
+                        </tr>
+                        {{else}}
+                        {{/if}}
                         <tr>
                             <th colspan="3" class="text-right">Total:</th>
-                            <th id="total" data-total="0">R$ 0,00</th>
+                            <th id="total" data-total="0">{{vlr_total}}</th>
                             <th></th>
                         </tr>
+                        {{else}}
+                        {{/each}}
                     </tfoot>
                 </table>
             </div>
