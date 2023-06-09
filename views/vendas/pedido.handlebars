@@ -5,8 +5,15 @@
                 {{#each pedido}}
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="mr-auto">PEDIDO: {{numpedido}}</h1>
-                    {{#if (eq status 1)}}
-                        <button type="button" class="btn btn-primary">Confirmar envio</button>
+                    {{#if (isStatusOne status)}}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#modalenvio">Confirmar envio</button>
+                    {{else}}
+                    {{#isMotoboy cod_rastreio}}
+                    <p>Pedido enviado por Motoboy</p>
+                    {{else}}
+                    <p>Codigo de Rastreio: {{cod_rastreio}}</p>
+                    {{/isMotoboy}}
                     {{/if}}
                 </div>
                 {{else}}
@@ -81,7 +88,7 @@
         </div>
         <hr>
 
-        
+
         {{#each pedido}}
         <div class="container my-4 d-flex flex-column">
             <h2 class="fs-4 text-center">PAGAMENTO</h2>
@@ -96,86 +103,149 @@
                 </div>
             </div>
         </div>
-        
-        
-            <div class="container my-4 d-flex flex-column">
-                <h2 class="fs-4 my-2 text-center">ENVIO</h2>
-                <div class="row border border-black ">
-                    <div class="col">
-                        <h3 class="d-inline fs-5">Forma de envio: </h3>
-                        <p class="d-inline fs-6">{{frete}}</p>
-                    </div>
-                    <div class="col">
-                        <h3 class="d-inline fs-5">Valor do Frete: </h3>
-                        <p class="d-inline fs-6">{{vlr_frete}}</p>
-                    </div>
+
+
+        <div class="container my-4 d-flex flex-column">
+            <h2 class="fs-4 my-2 text-center">ENVIO</h2>
+            <div class="row border border-black ">
+                <div class="col">
+                    <h3 class="d-inline fs-5">Forma de envio: </h3>
+                    <p class="d-inline fs-6">{{frete}}</p>
+                </div>
+                <div class="col">
+                    <h3 class="d-inline fs-5">Valor do Frete: </h3>
+                    <p class="d-inline fs-6">{{vlr_frete}}</p>
                 </div>
             </div>
+        </div>
         {{else}}
         {{/each}}
-            <div class="row">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Quantidade</th>
-                            <th>Valor</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="produtos">
-                        {{#each produtos}}
-                        <tr>
-                            <td>{{produto}}</td>
-                            <td>{{qntd}}</td>
-                            <td>{{vlr_uni}}</td>
-                            <td>{{total}}</td>
-                        </tr>
-                        {{else}}
-                        {{/each}}
-                    </tbody>
-                    <tfoot id="LinhaTotal">
-                        <tr>
-                            {{#each pedido}}
-                            <th colspan="3" class="text-right">Frete:</th>
-                            <th id="frete" data-frete="0">{{vlr_frete}}</th>
-                            <th></th>
-                        </tr>
-                        {{#if vlr_parcela}}
-                        <tr>
-                            <th class="text-right" colspan="3">Parcela:</th>
-                            <th>{{vlr_parcela}}</th>
-                        </tr>
-                        {{else}}
-                        {{/if}}
-                        <tr>
-                            <th colspan="3" class="text-right">Total:</th>
-                            <th id="total" data-total="0">{{vlr_total}}</th>
-                            <th></th>
-                        </tr>
-                        {{else}}
-                        {{/each}}
-                    </tfoot>
-                </table>
-            </div>
+        <div class="row">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Quantidade</th>
+                        <th>Valor</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="produtos">
+                    {{#each produtos}}
+                    <tr>
+                        <td>{{produto}}</td>
+                        <td>{{qntd}}</td>
+                        <td>{{vlr_uni}}</td>
+                        <td>{{total}}</td>
+                    </tr>
+                    {{else}}
+                    {{/each}}
+                </tbody>
+                <tfoot id="LinhaTotal">
+                    <tr>
+                        {{#each pedido}}
+                        <th colspan="3" class="text-right">Frete:</th>
+                        <th id="frete" data-frete="0">{{vlr_frete}}</th>
+                        <th></th>
+                    </tr>
+                    {{#if vlr_parcela}}
+                    <tr>
+                        <th class="text-right" colspan="3">Parcela:</th>
+                        <th>{{vlr_parcela}}</th>
+                    </tr>
+                    {{else}}
+                    {{/if}}
+                    <tr>
+                        <th colspan="3" class="text-right">Total:</th>
+                        <th id="total" data-total="0">{{vlr_total}}</th>
+                        <th></th>
+                    </tr>
+                    {{else}}
+                    {{/each}}
+                </tfoot>
+            </table>
         </div>
-
     </div>
 
+</div>
 
-    <!--BIBLIOTECAS-->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
-    <!--BIBLIOTECAS-->
 
-    <style>
-        #LinhaTotal tr:first-child {
-            order: -1;
+<!-- MODAL CONFIRMAÇÃO DE ENVIO DO PEDIDO -->
+<div class="modal fade" id="modalenvio" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmação de envio do pedido</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{#each pedido}}
+                <form id="formPedido" action="/vendas/pedido/{{numpedido}}/status" method="post">
+                <div class="mb-3">
+                    <label for="">Digite o codigo de rastreio: </label>
+                    <input type="text" name="rastreio" id="inputRastreio">
+                    <span id="errorMensagem" class="text-danger"></span>
+                </div>   
+                <div class="mb-3">
+                    <input type="checkbox" class="" id="checkboxDesabilitar" name="motoboy">
+                    <label class="form-check-label" for="checkboxDesabilitar">Motoboy</label>
+                </div>
+            </div>
+                
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                </form>
+                {{else}}
+                {{/each}}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const checkboxDesabilitar = document.getElementById('checkboxDesabilitar');
+    const inputRastreio = document.getElementById('inputRastreio');
+    const formPedido = document.getElementById('formPedido')
+
+    checkboxDesabilitar.addEventListener('change', function () {
+        if (this.checked) {
+            inputRastreio.disabled = true
+            inputRastreio.value = ""
+        } else {
+            inputRastreio.disabled = false
         }
-    </style>
+    });
+
+    //Validando se os campos foram preenchidos 
+    formPedido.addEventListener('submit', function (event) {
+
+        if (!inputRastreio.value.trim() && !checkboxDesabilitar.checked) {
+            event.preventDefault(); // Impedir o envio do formulário
+            document.getElementById('errorMensagem').textContent = "Por favor, digite o código de rastreio.";
+        }
+
+    })
+
+
+
+</script>
+
+<!--BIBLIOTECAS-->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+<!--BIBLIOTECAS-->
+
+<style>
+    #LinhaTotal tr:first-child {
+        order: -1;
+    }
+</style>

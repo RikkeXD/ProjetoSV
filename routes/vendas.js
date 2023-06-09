@@ -6,6 +6,7 @@ const Vendas = require('../models/Venda')
 const Pagamentos = require('../models/Pagamento')
 const Venda_Produto = require('../models/Venda_Produto')
 const moment = require('moment')
+const { where } = require('sequelize')
 
 async function BuscandoNomePorId(id) {
     try {
@@ -157,7 +158,7 @@ router.post('/novopedido', async (req, res) => {
             erros.push({ texto: "Erro na quantidade de parcela" })
         }
     }
-    
+
     if (Pagamentoid > 1) {
         QntdParcela = 1
     }
@@ -220,68 +221,106 @@ router.post('/novopedido', async (req, res) => {
 
 })
 
-router.get('/pedido/:id', async(req,res) =>{
+router.get('/pedido/:id', async (req, res) => {
     try {
         var pedido = []
         var listprodutos = []
 
-        const pedidoBD = await Vendas.findOne({where:{id: req.params.id}})
+        const pedidoBD = await Vendas.findOne({ where: { id: req.params.id } })
         const pedidoJSON = pedidoBD.toJSON()
 
         //Coletando informações do Usuarios
         const clienteid = pedidoJSON.cliente_id
-        const clienteBD = await Cliente.findOne({where: {id: clienteid}})
+        const clienteBD = await Cliente.findOne({ where: { id: clienteid } })
         const infoclientes = clienteBD.toJSON()
 
 
         //Coletando informações de pagamento
         const pagamentoid = pedidoJSON.pagamento_id
-        const pagamentoBD = await Pagamentos.findOne({where: {id: pagamentoid}})
+        const pagamentoBD = await Pagamentos.findOne({ where: { id: pagamentoid } })
         const infopagamento = pagamentoBD.toJSON()
         const nomepagamento = infopagamento.nome
 
         //Verificando se é Parcelado para informar o Front-End
         let vlr_parcela = null
-        if(pedidoJSON.qntd_parcela > 1 ){
+        if (pedidoJSON.qntd_parcela > 1) {
             parcela = pedidoJSON.qntd_parcela
             vlr_parcela = pedidoJSON.vlr_total / pedidoJSON.qntd_parcela
         }
-        
+
         // Criando um JSON para enviar para o Front-End
         pedido.push({
             numpedido: req.params.id,
             pagamento: nomepagamento,
             parcela: pedidoJSON.qntd_parcela,
             frete: pedidoJSON.frete,
-            vlr_parcela: vlr_parcela ? vlr_parcela.toLocaleString('pt-BR', {style: 'currency', currency:'BRL'}) : null,
-            vlr_frete: pedidoJSON.vlr_frete.toLocaleString('pt-BR', {style: 'currency', currency:'BRL'}),
-            vlr_total: pedidoJSON.vlr_total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
+            vlr_parcela: vlr_parcela ? vlr_parcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : null,
+            vlr_frete: pedidoJSON.vlr_frete.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+            vlr_total: pedidoJSON.vlr_total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+            cod_rastreio: pedidoJSON.cod_rastreio,
+            status: pedidoJSON.status
         })
 
         //Pegando todos os produtos do pedido
-        const produtosBD = await Venda_Produto.findAll({where: {venda_id: req.params.id}})
+        const produtosBD = await Venda_Produto.findAll({ where: { venda_id: req.params.id } })
         const produtosJSON = produtosBD.map(produto => produto.toJSON())
-        for (produtos of produtosJSON){
-            const NomeProduto = await Produto.findOne({where: {id: produtos.produto_id}})
+        for (produtos of produtosJSON) {
+            const NomeProduto = await Produto.findOne({ where: { id: produtos.produto_id } })
             const NomeProdutoJSON = NomeProduto.toJSON()
             const total = produtos.quantidade * produtos.vlr_uni
-            listprodutos.push({produto: NomeProdutoJSON.nome, 
-                    qntd: produtos.quantidade,
-                    vlr_uni: produtos.vlr_uni.toLocaleString('pt-BR', {style: 'currency', currency:'BRL'}),
-                    total: total.toLocaleString('pt-BR', {style: 'currency', currency:'BRL'})
-                })
+            listprodutos.push({
+                produto: NomeProdutoJSON.nome,
+                qntd: produtos.quantidade,
+                vlr_uni: produtos.vlr_uni.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                total: total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            })
             //console.log(totalFormatado)
-            console.log(listprodutos)
-            console.log(pedido)
+            //console.log(listprodutos)
+            //console.log(pedidoJSON)
         }
 
-
-        res.render('vendas/pedido', {produtos: listprodutos, cliente: infoclientes, pedido: pedido, vlr_parcela: vlr_parcela})
+        console.log(pedido)
+        res.render('vendas/pedido', { produtos: listprodutos, cliente: infoclientes, pedido: pedido, vlr_parcela: vlr_parcela })
         //console.log(pedidoJSON)
-    }  catch (erro){
+    } catch (erro) {
         console.log("Ocorreu o seguinte erro: " + erro)
-    }   
-    
-    
+    }
+
+
 })
+
+//Atualizando o STATUS do envio
+
+router.post('/pedido/:id/status', async (req, res) => {
+    const idpedido = req.params.id
+    let codstatus = ""
+    if (req.body.motoboy || req.body.rastreio) {
+        if (req.body.motoboy) {
+            codstatus = 2
+        } else {
+            codstatus = 2
+        }
+            const status = await Vendas.update({
+                status: codstatus,
+                cod_rastreio: req.body.rastreio ? req.body.rastreio : "Motoboy"
+            }, {where: {id: idpedido}}).then(()=>{
+                req.flash('success_msg', 'Rastreio atualizado com sucesso')
+                res.redirect(`/vendas/pedido/${idpedido}`)
+            }).catch((err) => {
+                console.log(err)
+                req.flash('error_msg', 'ERRO AO ATUALIZAR O STATUS')
+                res.redirect(`/vendas/pedido/${idpedido}`)
+            })
+
+            
+        }else{
+            console.log("ERRO AO ATUALIZAR O STATUS")
+            req.flash('error_msg', 'ERRO AO ATUALIZAR O STATUS')
+            res.redirect(`/vendas/pedido/${idpedido}`)
+        }
+})
+
+
+    
+    
 module.exports = router

@@ -4,7 +4,8 @@ const bodyParser = require('body-parser') //Coletar os dados do HTML e transform
 const flash = require('connect-flash') //Biblioteca para mensagens temporarias
 const session = require('express-session') //Biblioteca para realizar configuração de sessão para a aplicação
 const Sequelize = require('sequelize') //Sequelize Banco de Dados SQL
-const handlebars = require('express-handlebars')//Engine para o Front-End 
+const exphbs = require('express-handlebars')//Engine para o Front-End 
+const handlebars = require('handlebars')
 const path = require('path')//Realizar caminho padrão para alguns recursos
 const usuarios = require('./routes/usuarios')//Importando as Rotas do usuario
 const home = require('./routes/home')//Importando as Rotas do usuario
@@ -18,25 +19,42 @@ const moment = require('moment') //Biblioteca para ajuda na formatação das Dat
     require('./database')
     //Configurando para utilizar JSON
         app.use(express.json())
+
     //Handlebars
-
-    handlebars.registerHelper("eq", function (a, b, options) {
-        if (a === b) {
-            return options.fn(this);
-        } else {
-            return options.inverse(this);
-        }
-    });
-
-        app.engine('handlebars', handlebars.engine
-        ({defaultLayout: 'main',
+    const hbs = exphbs.create({
+        defaultLayout: 'main', 
         helpers: {
-            stringify: (obj) =>{
+            stringify: (obj) => {
                 return JSON.stringify(obj)
+            },
+            eq: function (a, b, options){
+                if (a === b){
+                    if(typeof options.fn === 'function'){
+                        return options.fn(this)
+                    }
+                } else{
+                    if(typeof options.inverse === 'function'){
+                        return options.inverse(this)
+                    }
+                    return ''
+                }
             }
         }
-    }))
+    })
 
+    handlebars.registerHelper('isStatusOne', function(status) {
+        return status === 1;
+      });
+
+    handlebars.registerHelper('isMotoboy', function (value, options) {
+        if (value === 'Motoboy') {
+          return options.fn(this);
+        } else {
+          return options.inverse(this);
+        }
+      });
+
+        app.engine('handlebars', hbs.engine)
         app.set('view engine', 'handlebars')
 
     // Public
