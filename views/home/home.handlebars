@@ -1,5 +1,79 @@
 <div style="position: relative;">
   <h1>Página home</h1>
+
+  <div class="container">
+    <h1>Dashboard</h1>
+    <div class="row">
+      <div class="col-md-6">
+        <canvas id="salesChart"></canvas>
+      </div>
+      <div class="col-md-6">
+        <canvas id="productsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.5.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Obter dados das vendas (exemplo)
+      var salesData = {
+        labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'],
+        datasets: [{
+          label: 'Vendas',
+          data: [100, 150, 200, 180, 250, 300],
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      };
+
+      // Obter dados dos produtos (exemplo)
+      var productsData = {
+        labels: ['Produto A', 'Produto B', 'Produto C', 'Produto D', 'Produto E'],
+        datasets: [{
+          label: 'Quantidade',
+          data: [50, 80, 120, 90, 60],
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      };
+
+      // Configurar gráfico de vendas
+      var salesChartCanvas = document.getElementById('salesChart').getContext('2d');
+      var salesChart = new Chart(salesChartCanvas, {
+        type: 'bar',
+        data: salesData,
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Configurar gráfico de produtos
+      var productsChartCanvas = document.getElementById('productsChart').getContext('2d');
+      var productsChart = new Chart(productsChartCanvas, {
+        type: 'bar',
+        data: productsData,
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    });
+  </script>
+
   <div class="position-fixed" style="bottom: 150px; right: 450px; z-index: 10000;">
     <a href="/vendas/nova"><button class="btn btn-primary" style="padding: 15px 20px;">Nova Venda</button></a>
   </div>
