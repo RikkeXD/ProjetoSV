@@ -165,6 +165,11 @@
                 </tfoot>
             </table>
         </div>
+        {{#each pedido}}
+        <div>
+            <a href="/vendas/{{numpedido}}/download"><button type="button" class="btn btn-success">IMPRIMIR</button></a>
+        </div>
+        {{/each}}
     </div>
 
 </div>

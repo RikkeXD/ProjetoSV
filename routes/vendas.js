@@ -7,6 +7,8 @@ const Pagamentos = require('../models/Pagamento')
 const Venda_Produto = require('../models/Venda_Produto')
 const moment = require('moment')
 const { where } = require('sequelize')
+const PDFdocument = require('pdfkit')
+const fs = require('fs')
 
 async function BuscandoNomePorId(id) {
     try {
@@ -300,27 +302,166 @@ router.post('/pedido/:id/status', async (req, res) => {
         } else {
             codstatus = 2
         }
-            const status = await Vendas.update({
-                status: codstatus,
-                cod_rastreio: req.body.rastreio ? req.body.rastreio : "Motoboy"
-            }, {where: {id: idpedido}}).then(()=>{
-                req.flash('success_msg', 'Rastreio atualizado com sucesso')
-                res.redirect(`/vendas/pedido/${idpedido}`)
-            }).catch((err) => {
-                console.log(err)
-                req.flash('error_msg', 'ERRO AO ATUALIZAR O STATUS')
-                res.redirect(`/vendas/pedido/${idpedido}`)
-            })
-
-            
-        }else{
-            console.log("ERRO AO ATUALIZAR O STATUS")
+        const status = await Vendas.update({
+            status: codstatus,
+            cod_rastreio: req.body.rastreio ? req.body.rastreio : "Motoboy"
+        }, { where: { id: idpedido } }).then(() => {
+            req.flash('success_msg', 'Rastreio atualizado com sucesso')
+            res.redirect(`/vendas/pedido/${idpedido}`)
+        }).catch((err) => {
+            console.log(err)
             req.flash('error_msg', 'ERRO AO ATUALIZAR O STATUS')
             res.redirect(`/vendas/pedido/${idpedido}`)
-        }
+        })
+
+
+    } else {
+        console.log("ERRO AO ATUALIZAR O STATUS")
+        req.flash('error_msg', 'ERRO AO ATUALIZAR O STATUS')
+        res.redirect(`/vendas/pedido/${idpedido}`)
+    }
 })
 
 
-    
-    
+//Download do pedido
+
+router.get('/:id/download', async (req, res) => {
+    try {
+        const pedido = await Vendas.findOne({ where: { id: req.params.id } })
+        if (!pedido) {
+            req.flash('error_msg', 'Pedido não encontrado !')
+            res.redirect('/vendas')
+        }
+
+        //Criando um novo documento PDF
+        const doc = new PDFdocument()
+
+        const stream = fs.createWriteStream('pedido.pdf');
+
+        // Inicia o documento e define as configurações iniciais
+        doc.pipe(stream);
+
+        // Define as margens do documento
+        doc.page.margins = { top: 50, bottom: 50, left: 50, right: 50 };
+
+        // Define as configurações de estilo para o texto
+        doc.font('Helvetica');
+        doc.fontSize(10);
+
+        // Função para criar uma célula com bordas
+        function createCell(text, x, y, width, height) {
+            doc.rect(x, y, width, height).stroke(); // Desenha o retângulo da célula
+            doc.text(text, x + 5, y + 5, { width: width - 10, align: 'left' }); // Adiciona o texto dentro da célula
+        }
+
+        // Função para criar uma linha horizontal
+        function createHorizontalLine(x1, y1, x2, y2) {
+            doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
+        }
+
+        // Função para criar uma linha vertical
+        function createVerticalLine(x, y1, y2) {
+            doc.moveTo(x, y1).lineTo(x, y2).stroke();
+        }
+
+        // Dados do destinatário
+
+        //DESTINATARIO
+        const destinatarioText = 'DESTINATÁRIO';
+        const destinatarioHeight = 20; // Altura do texto
+        const destinatarioY = 50; // Posição vertical inicial
+
+        // Centraliza o texto "DESTINATÁRIO" horizontalmente
+        const destinatarioWidth = doc.widthOfString(destinatarioText);
+        const destinatarioX = (doc.page.width - destinatarioWidth) / 2;
+
+        // Desenha o texto "DESTINATÁRIO" sem retângulo
+        doc.text(destinatarioText, destinatarioX, destinatarioY);
+
+        // Move para baixo, adicionando o espaço desejado após o texto "DESTINATÁRIO"
+        const espacoVertical = 10; // Espaço vertical desejado após o texto
+        const novaPosicaoY = destinatarioY + destinatarioHeight + espacoVertical;
+
+        // Define a nova posição vertical para continuar adicionando outros elementos
+        doc.y = novaPosicaoY;
+        //DESTINATARIO
+
+        
+        doc.moveTo(50, 70).lineTo(550, 70).stroke();
+        createCell('Nome:', 50, 80, 300, 20);
+        createCell('Telefone:', 380, 80, 170, 20);
+        createCell('E-mail:', 50, 110, 300, 20);
+        createCell('CPF: 506.207.738-98', 380, 110, 170, 20);
+        createCell('Endereço:', 50, 140, 300, 20);
+        createCell('Número:', 380, 140, 170, 20);
+        createCell('Bairro:', 50, 170, 240, 20);
+        createCell('CEP: ', 310, 170, 120, 20);
+        createCell('UF:', 450, 170, 100, 20);
+
+        //createCell('Complemento:', 250, 140, 100, 20);
+
+
+
+        // Dados da compra
+        createCell('Dados da Compra', 50, 210, 500, 20);
+        createCell('Forma de Pgto:', 50, 240, 180, 20);
+        createCell('Parcelas:', 250, 240, 100, 20);
+        createCell('Modo de Envio:', 370, 240, 180, 20);
+
+        // Cabeçalho da tabela
+        createCell('Cod. Produto', 50, 280, 100, 20);
+        createCell('Produto', 150, 280, 130, 20);
+        createCell('QTD', 280, 280, 50, 20);
+        createCell('Valor Unitário', 330, 280, 110, 20);
+        createCell('Valor Total', 440, 280, 110, 20);
+
+        // Exemplo de linha da tabela
+        createCell('001', 50, 310, 100, 20);
+        createCell('Produto 1', 150, 310, 130, 20);
+        createCell('2', 280, 310, 50, 20);
+        createCell('R$ 50', 330, 310, 110, 20);
+        createCell('R$ 100', 440, 310, 110, 20);
+
+        // Linhas horizontais da tabela
+        //createHorizontalLine(50, 330, 500, 330);
+        //createHorizontalLine(50, 350, 500, 350);
+
+        // Exemplo de linha da tabela
+        createCell('002', 50, 335, 100, 20);
+        createCell('Produto 2', 150, 335, 130, 20);
+        createCell('3', 280, 335, 50, 20);
+        createCell('R$ 50', 330, 335, 110, 20);
+        createCell('R$ 150', 440, 335, 110, 20);
+
+        // Linha horizontal final da tabela
+        createHorizontalLine(50, 390, 500, 390);
+
+        // Dados finais
+        createCell('Frete:', 50, 410, 100, 20);
+        createCell('Parcela:', 50, 470, 100, 20);
+        createCell('Total:', 250, 470, 100, 20);
+
+
+        res.setHeader('Content-Disposition', 'attachment; filename="pedido.pdf"');
+        res.setHeader('Content-Type', 'application/pdf');
+
+        // Encerra o documento e finaliza o stream
+        doc.end();
+
+        stream.on('finish', () => {
+            // Define os cabeçalhos de resposta para download do arquivo
+            res.setHeader('Content-Disposition', 'attachment; filename="pedido.pdf"');
+            res.setHeader('Content-Type', 'application/pdf');
+            // Envia o arquivo PDF como resposta de download
+            res.download('pedido.pdf');
+        });
+    }
+    catch (err) {
+        req.flash('error_msg', 'Erro ao baixar o pedido')
+        console.log("ERRO: " + err)
+        res.redirect('/vendas')
+    }
+
+})
+
 module.exports = router

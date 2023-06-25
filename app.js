@@ -14,6 +14,8 @@ const produtos = require('./routes/produtos')
 const vendas = require('./routes/vendas')
 const moment = require('moment') //Biblioteca para ajuda na formatação das Datas
 
+
+
 //Configurações
     //Banco de Dados
     require('./database')
