@@ -324,10 +324,7 @@ router.post('/pedido/:id/status', async (req, res) => {
 })
 
 
-//Download do pedido
-
-
-
+//Criação do PDF
 router.get('/:id/download', async (req, res) => {
     try {
         const pedido = await Vendas.findOne({ where: { id: req.params.id } })
@@ -353,8 +350,20 @@ router.get('/:id/download', async (req, res) => {
             doc.rect(x, y, width, height).stroke();
         }
 
-        function createHorizontalLine(x1, y1, x2, y2) {
-            doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
+        function createCellWithLabelTitulo(label, value, x, y, width, height) {
+            doc.text(label, x + 3, y + 6, { align: 'left' });
+            doc.text(value, x + 5, y + 15, { align: 'left' });
+            doc.rect(x, y, width, height).stroke();
+        }
+
+        function createCellWithLabelProduto(label, value, x, y, width, height) {
+            doc.text(label, x + 3, y + 6, { align: 'left' });
+            doc.text(value, x + 5, y + 15, { align: 'left' });
+            doc.rect(x, y, width, height).stroke();
+        }
+
+        function createBorderedCell(x, y, width, height) {
+            doc.rect(x, y, width, height).stroke();
         }
 
         doc.text('M.A SAUDE E VIDA', 50, 50, { align: 'left' });
@@ -363,7 +372,7 @@ router.get('/:id/download', async (req, res) => {
         //Imagem
         const imageX = 430; // Posição X da imagem
         const imageY = 40; // Posição Y da imagem
-        const imagePath = path.join(__dirname, "../media/logo-sv.png")
+        const imagePath = path.join(__dirname, "../media/logo-sv.png");
 
         // Verifica se o arquivo da imagem existe
         if (fs.existsSync(imagePath)) {
@@ -398,6 +407,49 @@ router.get('/:id/download', async (req, res) => {
         createCellWithLabel('Parcelas:', '3', destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
         createCellWithLabel('Modo de Envio:', 'Expresso', destinatarioX + 300, novaPosicaoY + 141, 200, nomeHeight);
 
+        const tituloX = destinatarioX;
+        const tituloY = novaPosicaoY + 190;
+        const tituloWidth = 30;
+        const tituloHeight = 20;
+
+        createCellWithLabelTitulo('Cod', null, tituloX, tituloY, tituloWidth, tituloHeight);
+        createCellWithLabelTitulo('Produto', null, tituloX + tituloWidth, tituloY, 150, tituloHeight);
+        createCellWithLabelTitulo('Qtd', null, tituloX + tituloWidth + 150, tituloY, 40, tituloHeight);
+        createCellWithLabelTitulo('Valor Unitário', null, tituloX + tituloWidth + 150 + 40, tituloY, 130, tituloHeight);
+        createCellWithLabelTitulo('Valor Total', null, tituloX + tituloWidth + 150 + 40 + 130, tituloY, 150, tituloHeight);
+
+
+        //Produtos:
+        const produtos = [
+            { cod: '001', produto: 'Produto 1', qtd: '2', valorUnitario: '10', valorTotal: '20' },
+            { cod: '002', produto: 'Produto 2', qtd: '3', valorUnitario: '15', valorTotal: '45' },
+            { cod: '003', produto: 'Produto 3', qtd: '1', valorUnitario: '20', valorTotal: '20' },
+            // ... adicione mais produtos conforme necessário
+        ];
+
+        const produtoY = novaPosicaoY + 190;
+        const produtoHeight = 20;
+        const espacoVerticalProdutos = 5;
+
+        // Cria a borda para os produtos
+        const produtosX = destinatarioX;
+        const produtosWidth = 500;
+        const produtosHeight = (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos);
+        createBorderedCell(produtosX, produtoY, produtosWidth, produtosHeight);
+
+        // Cria as células para cada produto
+        produtos.forEach((produto, index) => {
+            const produtoX = produtosX;
+            const produtoCellY = produtoY + index * (produtoHeight + espacoVerticalProdutos);
+
+            createCellWithLabelProduto(produto.cod, null, produtoX, produtoCellY, tituloWidth, produtoHeight);
+            createCellWithLabelProduto(produto.produto, null, produtoX + tituloWidth, produtoCellY, 150, produtoHeight);
+            createCellWithLabelProduto(produto.qtd, null, produtoX + tituloWidth + 150, produtoCellY, 40, produtoHeight);
+            createCellWithLabelProduto(produto.valorUnitario, null, produtoX + tituloWidth + 150 + 40, produtoCellY, 130, produtoHeight);
+            createCellWithLabelProduto(produto.valorTotal, null, produtoX + tituloWidth + 150 + 40 + 130, produtoCellY, 150, produtoHeight);
+        });
+
+        //createCellWithLabelTitulo('Produto', null, tituloX + tituloWidth, tituloY + 25, 150, tituloHeight);
 
         // Inicia o stream
         //const stream = doc.pipe(fs.createWriteStream('pedido.pdf'));
