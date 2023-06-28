@@ -9,6 +9,7 @@ const moment = require('moment')
 const { where } = require('sequelize')
 const PDFdocument = require('pdfkit')
 const fs = require('fs')
+const path = require('path')
 
 async function BuscandoNomePorId(id) {
     try {
@@ -325,6 +326,8 @@ router.post('/pedido/:id/status', async (req, res) => {
 
 //Download do pedido
 
+
+
 router.get('/:id/download', async (req, res) => {
     try {
         const pedido = await Vendas.findOne({ where: { id: req.params.id } })
@@ -335,130 +338,94 @@ router.get('/:id/download', async (req, res) => {
 
         //Criando um novo documento PDF
         const doc = new PDFdocument()
-
         const stream = fs.createWriteStream('pedido.pdf');
-
         // Inicia o documento e define as configurações iniciais
         doc.pipe(stream);
 
-        // Define as margens do documento
-        doc.page.margins = { top: 50, bottom: 50, left: 50, right: 50 };
 
-        // Define as configurações de estilo para o texto
+        doc.page.margins = { top: 50, bottom: 50, left: 50, right: 50 };
         doc.font('Helvetica');
         doc.fontSize(10);
 
-        // Função para criar uma célula com bordas
-        function createCell(text, x, y, width, height) {
-            doc.rect(x, y, width, height).stroke(); // Desenha o retângulo da célula
-            doc.text(text, x + 5, y + 5, { width: width - 10, align: 'left' }); // Adiciona o texto dentro da célula
+        function createCellWithLabel(label, value, x, y, width, height) {
+            doc.text(label, x + 1.5, y + 2, { align: 'left' });
+            doc.text(value, x + 2, y + 15, { align: 'left' });
+            doc.rect(x, y, width, height).stroke();
         }
 
-        // Função para criar uma linha horizontal
         function createHorizontalLine(x1, y1, x2, y2) {
             doc.moveTo(x1, y1).lineTo(x2, y2).stroke();
         }
 
-        // Função para criar uma linha vertical
-        function createVerticalLine(x, y1, y2) {
-            doc.moveTo(x, y1).lineTo(x, y2).stroke();
+        doc.text('M.A SAUDE E VIDA', 50, 50, { align: 'left' });
+        doc.text('CNPJ:13.822.074/0001-55', 50, 65, { align: 'left' });
+
+        //Imagem
+        const imageX = 430; // Posição X da imagem
+        const imageY = 40; // Posição Y da imagem
+        const imagePath = path.join(__dirname, "../media/logo-sv.png")
+
+        // Verifica se o arquivo da imagem existe
+        if (fs.existsSync(imagePath)) {
+            doc.image(imagePath, imageX, imageY, { width: 400 });
         }
 
-        // Dados do destinatário
-
-        //DESTINATARIO
-        const destinatarioText = 'DESTINATÁRIO';
-        const destinatarioHeight = 20; // Altura do texto
-        const destinatarioY = 50; // Posição vertical inicial
-
-        // Centraliza o texto "DESTINATÁRIO" horizontalmente
-        const destinatarioWidth = doc.widthOfString(destinatarioText);
-        const destinatarioX = (doc.page.width - destinatarioWidth) / 2;
-
-        // Desenha o texto "DESTINATÁRIO" sem retângulo
-        doc.text(destinatarioText, destinatarioX, destinatarioY);
-
-        // Move para baixo, adicionando o espaço desejado após o texto "DESTINATÁRIO"
-        const espacoVertical = 10; // Espaço vertical desejado após o texto
+        const destinatarioHeight = 20;
+        const destinatarioY = 80;
+        const destinatarioX = 50;
+        const espacoVertical = 10;
         const novaPosicaoY = destinatarioY + destinatarioHeight + espacoVertical;
 
-        // Define a nova posição vertical para continuar adicionando outros elementos
         doc.y = novaPosicaoY;
-        //DESTINATARIO
 
-        
-        doc.moveTo(50, 70).lineTo(550, 70).stroke();
-        createCell('Nome:', 50, 80, 300, 20);
-        createCell('Telefone:', 380, 80, 170, 20);
-        createCell('E-mail:', 50, 110, 300, 20);
-        createCell('CPF: 506.207.738-98', 380, 110, 170, 20);
-        createCell('Endereço:', 50, 140, 300, 20);
-        createCell('Número:', 380, 140, 170, 20);
-        createCell('Bairro:', 50, 170, 240, 20);
-        createCell('CEP: ', 310, 170, 120, 20);
-        createCell('UF:', 450, 170, 100, 20);
+        const nomeY = novaPosicaoY;
+        const nomeWidth = 200;
+        const nomeHeight = 28; //Altura das Bordas
 
-        //createCell('Complemento:', 250, 140, 100, 20);
+        doc.text('Destinatário/Remetente', destinatarioX, novaPosicaoY - 12, { align: 'left' });
+        createCellWithLabel('Nome:', 'John Doe', destinatarioX, nomeY, nomeWidth, nomeHeight);
+        createCellWithLabel('Telefone:', '(123) 456-7890', destinatarioX + 200, nomeY, 130, nomeHeight);
+        createCellWithLabel('CPF:', '506.207.738-98', destinatarioX + 330, nomeY, 170, nomeHeight);
+        createCellWithLabel('Endereço:', '1234 Main St', destinatarioX, nomeY + 30, 330, nomeHeight);
+        createCellWithLabel('Número:', '123', destinatarioX + 330, nomeY + 30, 170, nomeHeight);
+        createCellWithLabel('Bairro:', 'Centro', destinatarioX, nomeY + 60, 260, nomeHeight);
+        createCellWithLabel('CEP:', '12345-678', destinatarioX + 260, nomeY + 60, 140, nomeHeight);
+        createCellWithLabel('UF:', 'SP', destinatarioX + 400, nomeY + 60, 100, nomeHeight);
+        createCellWithLabel('Complemento', 'CASA 2 Verde', destinatarioX, nomeY + 90, 500, nomeHeight);
 
-
-
-        // Dados da compra
-        createCell('Dados da Compra', 50, 210, 500, 20);
-        createCell('Forma de Pgto:', 50, 240, 180, 20);
-        createCell('Parcelas:', 250, 240, 100, 20);
-        createCell('Modo de Envio:', 370, 240, 180, 20);
-
-        // Cabeçalho da tabela
-        createCell('Cod. Produto', 50, 280, 100, 20);
-        createCell('Produto', 150, 280, 130, 20);
-        createCell('QTD', 280, 280, 50, 20);
-        createCell('Valor Unitário', 330, 280, 110, 20);
-        createCell('Valor Total', 440, 280, 110, 20);
-
-        // Exemplo de linha da tabela
-        createCell('001', 50, 310, 100, 20);
-        createCell('Produto 1', 150, 310, 130, 20);
-        createCell('2', 280, 310, 50, 20);
-        createCell('R$ 50', 330, 310, 110, 20);
-        createCell('R$ 100', 440, 310, 110, 20);
-
-        // Linhas horizontais da tabela
-        //createHorizontalLine(50, 330, 500, 330);
-        //createHorizontalLine(50, 350, 500, 350);
-
-        // Exemplo de linha da tabela
-        createCell('002', 50, 335, 100, 20);
-        createCell('Produto 2', 150, 335, 130, 20);
-        createCell('3', 280, 335, 50, 20);
-        createCell('R$ 50', 330, 335, 110, 20);
-        createCell('R$ 150', 440, 335, 110, 20);
-
-        // Linha horizontal final da tabela
-        createHorizontalLine(50, 390, 500, 390);
-
-        // Dados finais
-        createCell('Frete:', 50, 410, 100, 20);
-        createCell('Parcela:', 50, 470, 100, 20);
-        createCell('Total:', 250, 470, 100, 20);
+        doc.text('Dados da Compra', destinatarioX, novaPosicaoY + 130, { align: 'left' });
+        createCellWithLabel('Forma de Pgto:', 'Cartão de Crédito', destinatarioX, novaPosicaoY + 141, 200, nomeHeight);
+        createCellWithLabel('Parcelas:', '3', destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
+        createCellWithLabel('Modo de Envio:', 'Expresso', destinatarioX + 300, novaPosicaoY + 141, 200, nomeHeight);
 
 
-        res.setHeader('Content-Disposition', 'attachment; filename="pedido.pdf"');
-        res.setHeader('Content-Type', 'application/pdf');
+        // Inicia o stream
+        //const stream = doc.pipe(fs.createWriteStream('pedido.pdf'));
+
+        // Evento de conclusão do stream
+        stream.on('finish', () => {
+            // Lê o arquivo PDF e envia como resposta de download
+            fs.readFile('pedido.pdf', (err, data) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Erro ao gerar o PDF');
+                }
+
+                // Define os cabeçalhos de resposta para abrir o PDF no navegador
+                res.setHeader('Content-Disposition', 'inline; filename="pedido.pdf"');
+                res.setHeader('Content-Type', 'application/pdf');
+
+                // Envia o arquivo PDF como resposta
+                res.send(data);
+            });
+        });
 
         // Encerra o documento e finaliza o stream
         doc.end();
-
-        stream.on('finish', () => {
-            // Define os cabeçalhos de resposta para download do arquivo
-            res.setHeader('Content-Disposition', 'attachment; filename="pedido.pdf"');
-            res.setHeader('Content-Type', 'application/pdf');
-            // Envia o arquivo PDF como resposta de download
-            res.download('pedido.pdf');
-        });
     }
     catch (err) {
         req.flash('error_msg', 'Erro ao baixar o pedido')
-        console.log("ERRO: " + err)
+        console.log("ERRO: ++++++++++++++++++++++ " + err)
         res.redirect('/vendas')
     }
 
