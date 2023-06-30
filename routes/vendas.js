@@ -418,7 +418,6 @@ router.get('/:id/download', async (req, res) => {
         createCellWithLabelTitulo('Valor Unitário', null, tituloX + tituloWidth + 150 + 40, tituloY, 130, tituloHeight);
         createCellWithLabelTitulo('Valor Total', null, tituloX + tituloWidth + 150 + 40 + 130, tituloY, 150, tituloHeight);
 
-
         //Produtos:
         const produtos = [
             { cod: '001', produto: 'Produto 1', qtd: '2', valorUnitario: '10', valorTotal: '20' },
@@ -427,15 +426,14 @@ router.get('/:id/download', async (req, res) => {
             // ... adicione mais produtos conforme necessário
         ];
 
-        const produtoY = novaPosicaoY + 190;
+        const produtoY = novaPosicaoY + 215;
         const produtoHeight = 20;
         const espacoVerticalProdutos = 5;
 
         // Cria a borda para os produtos
         const produtosX = destinatarioX;
         const produtosWidth = 500;
-        const produtosHeight = (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos);
-        createBorderedCell(produtosX, produtoY, produtosWidth, produtosHeight);
+        const produtosHeight = (produtos.length) * (produtoHeight + espacoVerticalProdutos);
 
         // Cria as células para cada produto
         produtos.forEach((produto, index) => {
