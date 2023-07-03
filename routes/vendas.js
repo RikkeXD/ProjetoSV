@@ -362,12 +362,20 @@ router.get('/:id/download', async (req, res) => {
             doc.rect(x, y, width, height).stroke();
         }
 
+        function createCellWithLabelTotal(label, value, x, y, width, height) {
+            doc.text(label, x + 3, y + 2, { align: 'left' });
+            doc.text(value, x + 5, y + 15, { align: 'left' });
+            doc.rect(x, y, width, height).stroke();
+        }
+
         function createBorderedCell(x, y, width, height) {
             doc.rect(x, y, width, height).stroke();
         }
 
         doc.text('M.A SAUDE E VIDA', 50, 50, { align: 'left' });
         doc.text('CNPJ:13.822.074/0001-55', 50, 65, { align: 'left' });
+        doc.text('Emissão: 30/06/2023', 335, 50, { align: 'left' });
+        //doc.text('Pedido 7', 385, 65, { align: 'left' });
 
         //Imagem
         const imageX = 430; // Posição X da imagem
@@ -392,6 +400,8 @@ router.get('/:id/download', async (req, res) => {
         const nomeHeight = 28; //Altura das Bordas
 
         doc.text('Destinatário/Remetente', destinatarioX, novaPosicaoY - 12, { align: 'left' });
+        doc.text('Pedido 7', destinatarioX + 460, novaPosicaoY - 12, { align: 'left' });
+        //doc.text('Emissão: 30/06/2023', destinatarioX + 220, novaPosicaoY - 12, { align: 'left' });
         createCellWithLabel('Nome:', 'John Doe', destinatarioX, nomeY, nomeWidth, nomeHeight);
         createCellWithLabel('Telefone:', '(123) 456-7890', destinatarioX + 200, nomeY, 130, nomeHeight);
         createCellWithLabel('CPF:', '506.207.738-98', destinatarioX + 330, nomeY, 170, nomeHeight);
@@ -419,26 +429,24 @@ router.get('/:id/download', async (req, res) => {
         createCellWithLabelTitulo('Valor Total', null, tituloX + tituloWidth + 150 + 40 + 130, tituloY, 150, tituloHeight);
 
         //Produtos:
+
         const produtos = [
             { cod: '001', produto: 'Produto 1', qtd: '2', valorUnitario: '10', valorTotal: '20' },
-            { cod: '002', produto: 'Produto 2', qtd: '3', valorUnitario: '15', valorTotal: '45' },
-            { cod: '003', produto: 'Produto 3', qtd: '1', valorUnitario: '20', valorTotal: '20' },
             // ... adicione mais produtos conforme necessário
         ];
 
-        const produtoY = novaPosicaoY + 215;
+        const produtosX = destinatarioX;
+        const produtosY = novaPosicaoY + 215;
         const produtoHeight = 20;
         const espacoVerticalProdutos = 5;
 
         // Cria a borda para os produtos
-        const produtosX = destinatarioX;
-        const produtosWidth = 500;
-        const produtosHeight = (produtos.length) * (produtoHeight + espacoVerticalProdutos);
+        createBorderedCell(produtosX, produtosY, 500, produtoHeight);
 
         // Cria as células para cada produto
         produtos.forEach((produto, index) => {
             const produtoX = produtosX;
-            const produtoCellY = produtoY + index * (produtoHeight + espacoVerticalProdutos);
+            const produtoCellY = produtosY + index * (produtoHeight + espacoVerticalProdutos);
 
             createCellWithLabelProduto(produto.cod, null, produtoX, produtoCellY, tituloWidth, produtoHeight);
             createCellWithLabelProduto(produto.produto, null, produtoX + tituloWidth, produtoCellY, 150, produtoHeight);
@@ -447,10 +455,14 @@ router.get('/:id/download', async (req, res) => {
             createCellWithLabelProduto(produto.valorTotal, null, produtoX + tituloWidth + 150 + 40 + 130, produtoCellY, 150, produtoHeight);
         });
 
-        //createCellWithLabelTitulo('Produto', null, tituloX + tituloWidth, tituloY + 25, 150, tituloHeight);
+        // Adiciona o campo "Total" na mesma coluna que "Valor Total"
+        createCellWithLabelTotal('Frete:', 'R$ 15,89', produtosX + tituloWidth + 150 + 40 + 130, produtosY + produtos.length * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
-        // Inicia o stream
-        //const stream = doc.pipe(fs.createWriteStream('pedido.pdf'));
+        //Valor Parcela
+        createCellWithLabelTotal('Parcela:', 'R$ 150', produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos +2), 150, produtoHeight + 5);
+
+        //Valor Total
+        createCellWithLabelTotal('Valor Total:', 'R$ 450', produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 2) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
         // Evento de conclusão do stream
         stream.on('finish', () => {
