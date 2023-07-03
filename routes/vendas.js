@@ -224,19 +224,17 @@ router.post('/novopedido', async (req, res) => {
 
 })
 
-router.get('/pedido/:id', async (req, res) => {
-    try {
-        var pedido = []
-        var listprodutos = []
 
-        const pedidoBD = await Vendas.findOne({ where: { id: req.params.id } })
+async function BuscaPedido(Idvenda) {
+    try {
+        //Coletando dados do cliente
+        const pedidoBD = await Vendas.findOne({ where: { id: Idvenda } })
         const pedidoJSON = pedidoBD.toJSON()
 
-        //Coletando informações do Usuarios
+        //Coletando dados do Cliente
         const clienteid = pedidoJSON.cliente_id
         const clienteBD = await Cliente.findOne({ where: { id: clienteid } })
         const infoclientes = clienteBD.toJSON()
-
 
         //Coletando informações de pagamento
         const pagamentoid = pedidoJSON.pagamento_id
@@ -244,16 +242,16 @@ router.get('/pedido/:id', async (req, res) => {
         const infopagamento = pagamentoBD.toJSON()
         const nomepagamento = infopagamento.nome
 
-        //Verificando se é Parcelado para informar o Front-End
-        let vlr_parcela = null
+        //Verificando se é Parcelado para informar o Front-End e habilitar o campo parcela
         if (pedidoJSON.qntd_parcela > 1) {
             parcela = pedidoJSON.qntd_parcela
             vlr_parcela = pedidoJSON.vlr_total / pedidoJSON.qntd_parcela
         }
 
-        // Criando um JSON para enviar para o Front-End
+        //Criando Pedido
+        let pedido = []
         pedido.push({
-            numpedido: req.params.id,
+            numpedido: Idvenda,
             pagamento: nomepagamento,
             parcela: pedidoJSON.qntd_parcela,
             frete: pedidoJSON.frete,
@@ -264,25 +262,46 @@ router.get('/pedido/:id', async (req, res) => {
             status: pedidoJSON.status
         })
 
-        //Pegando todos os produtos do pedido
-        const produtosBD = await Venda_Produto.findAll({ where: { venda_id: req.params.id } })
+        //Coletando Todos os produtos do pedido
+
+        let listprodutos = []
+        const produtosBD = await Venda_Produto.findAll({ where: { venda_id: Idvenda } })
         const produtosJSON = produtosBD.map(produto => produto.toJSON())
         for (produtos of produtosJSON) {
             const NomeProduto = await Produto.findOne({ where: { id: produtos.produto_id } })
             const NomeProdutoJSON = NomeProduto.toJSON()
             const total = produtos.quantidade * produtos.vlr_uni
             listprodutos.push({
+                id: produtos.produto_id,
                 produto: NomeProdutoJSON.nome,
                 qntd: produtos.quantidade,
                 vlr_uni: produtos.vlr_uni.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
                 total: total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             })
-            //console.log(totalFormatado)
-            //console.log(listprodutos)
-            //console.log(pedidoJSON)
         }
 
         console.log(pedido)
+
+        return {
+            pedido: pedidoJSON,
+            cliente: infoclientes,
+            pedido: pedido,
+            listprodutos: listprodutos
+        }
+    } catch (err) {
+        console.log("Ocorreu o erro: " + err)
+    }
+}
+
+
+router.get('/pedido/:id', async (req, res) => {
+    try {
+        const pedidoInfo = await BuscaPedido(req.params.id)
+        const pedidoJSON = pedidoInfo.pedido
+        const infoclientes = pedidoInfo.cliente
+        const pedido = pedidoInfo.pedido
+        const listprodutos = pedidoInfo.listprodutos
+
         res.render('vendas/pedido', { produtos: listprodutos, cliente: infoclientes, pedido: pedido, vlr_parcela: vlr_parcela })
         //console.log(pedidoJSON)
     } catch (erro) {
@@ -333,6 +352,10 @@ router.get('/:id/download', async (req, res) => {
             res.redirect('/vendas')
         }
 
+        //Coletando dados do pedido
+        const DadosPedido = await BuscaPedido(req.params.id)
+        const produtos = DadosPedido.listprodutos
+
         //Criando um novo documento PDF
         const doc = new PDFdocument()
         const stream = fs.createWriteStream('pedido.pdf');
@@ -374,8 +397,6 @@ router.get('/:id/download', async (req, res) => {
 
         doc.text('M.A SAUDE E VIDA', 50, 50, { align: 'left' });
         doc.text('CNPJ:13.822.074/0001-55', 50, 65, { align: 'left' });
-        doc.text('Emissão: 30/06/2023', 335, 50, { align: 'left' });
-        //doc.text('Pedido 7', 385, 65, { align: 'left' });
 
         //Imagem
         const imageX = 430; // Posição X da imagem
@@ -400,8 +421,8 @@ router.get('/:id/download', async (req, res) => {
         const nomeHeight = 28; //Altura das Bordas
 
         doc.text('Destinatário/Remetente', destinatarioX, novaPosicaoY - 12, { align: 'left' });
-        doc.text('Pedido 7', destinatarioX + 460, novaPosicaoY - 12, { align: 'left' });
-        //doc.text('Emissão: 30/06/2023', destinatarioX + 220, novaPosicaoY - 12, { align: 'left' });
+        doc.text('Pedido 7 /', destinatarioX + 350, novaPosicaoY - 12, { align: 'left' });
+        doc.text('Emissão 30/06/2023', destinatarioX + 400, novaPosicaoY - 12, { align: 'left' });
         createCellWithLabel('Nome:', 'John Doe', destinatarioX, nomeY, nomeWidth, nomeHeight);
         createCellWithLabel('Telefone:', '(123) 456-7890', destinatarioX + 200, nomeY, 130, nomeHeight);
         createCellWithLabel('CPF:', '506.207.738-98', destinatarioX + 330, nomeY, 170, nomeHeight);
@@ -428,38 +449,31 @@ router.get('/:id/download', async (req, res) => {
         createCellWithLabelTitulo('Valor Unitário', null, tituloX + tituloWidth + 150 + 40, tituloY, 130, tituloHeight);
         createCellWithLabelTitulo('Valor Total', null, tituloX + tituloWidth + 150 + 40 + 130, tituloY, 150, tituloHeight);
 
-        //Produtos:
-
-        const produtos = [
-            { cod: '001', produto: 'Produto 1', qtd: '2', valorUnitario: '10', valorTotal: '20' },
-            // ... adicione mais produtos conforme necessário
-        ];
-
         const produtosX = destinatarioX;
         const produtosY = novaPosicaoY + 215;
         const produtoHeight = 20;
         const espacoVerticalProdutos = 5;
 
-        // Cria a borda para os produtos
+        //Cria a borda para os produtos
         createBorderedCell(produtosX, produtosY, 500, produtoHeight);
 
-        // Cria as células para cada produto
+        //Cria as células para cada produto
         produtos.forEach((produto, index) => {
             const produtoX = produtosX;
             const produtoCellY = produtosY + index * (produtoHeight + espacoVerticalProdutos);
 
-            createCellWithLabelProduto(produto.cod, null, produtoX, produtoCellY, tituloWidth, produtoHeight);
+            createCellWithLabelProduto(produto.id, null, produtoX, produtoCellY, tituloWidth, produtoHeight);
             createCellWithLabelProduto(produto.produto, null, produtoX + tituloWidth, produtoCellY, 150, produtoHeight);
-            createCellWithLabelProduto(produto.qtd, null, produtoX + tituloWidth + 150, produtoCellY, 40, produtoHeight);
-            createCellWithLabelProduto(produto.valorUnitario, null, produtoX + tituloWidth + 150 + 40, produtoCellY, 130, produtoHeight);
-            createCellWithLabelProduto(produto.valorTotal, null, produtoX + tituloWidth + 150 + 40 + 130, produtoCellY, 150, produtoHeight);
+            createCellWithLabelProduto(produto.qntd, null, produtoX + tituloWidth + 150, produtoCellY, 40, produtoHeight);
+            createCellWithLabelProduto(produto.vlr_uni, null, produtoX + tituloWidth + 150 + 40, produtoCellY, 130, produtoHeight);
+            createCellWithLabelProduto(produto.total, null, produtoX + tituloWidth + 150 + 40 + 130, produtoCellY, 150, produtoHeight);
         });
 
         // Adiciona o campo "Total" na mesma coluna que "Valor Total"
         createCellWithLabelTotal('Frete:', 'R$ 15,89', produtosX + tituloWidth + 150 + 40 + 130, produtosY + produtos.length * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
         //Valor Parcela
-        createCellWithLabelTotal('Parcela:', 'R$ 150', produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos +2), 150, produtoHeight + 5);
+        createCellWithLabelTotal('Parcela:', 'R$ 150', produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
         //Valor Total
         createCellWithLabelTotal('Valor Total:', 'R$ 450', produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 2) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
@@ -481,6 +495,8 @@ router.get('/:id/download', async (req, res) => {
                 res.send(data);
             });
         });
+
+        
 
         // Encerra o documento e finaliza o stream
         doc.end();
