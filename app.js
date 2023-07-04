@@ -48,6 +48,10 @@ const moment = require('moment') //Biblioteca para ajuda na formatação das Dat
         return status === 1;
       });
 
+    handlebars.registerHelper('isStatusEnd', function(status) {
+        return status === 2;
+      });
+
     handlebars.registerHelper('isMotoboy', function (value, options) {
         if (value === 'Motoboy') {
           return options.fn(this);

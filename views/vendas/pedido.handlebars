@@ -166,10 +166,18 @@
             </table>
         </div>
         {{#each pedido}}
-        <div>
-            <a href="/vendas/{{numpedido}}/download"><button type="button" class="btn btn-success">IMPRIMIR</button></a>
+        <div class="d-flex justify-content-between">
+            <a href="/vendas/{{numpedido}}/download"><button type="button" class="btn btn-primary">IMPRIMIR</button></a>
+            {{#if (isStatusEnd status)}}
+            <a href="/vendas/{{numpedido}}/finalizar"><button type="button" class="btn btn-success">FINALIZAR
+                    PEDIDO</button></a>
+            {{else}}
+            {{/if}}
         </div>
         {{/each}}
+        <div>
+
+        </div>
     </div>
 
 </div>
@@ -186,17 +194,17 @@
             <div class="modal-body">
                 {{#each pedido}}
                 <form id="formPedido" action="/vendas/pedido/{{numpedido}}/status" method="post">
-                <div class="mb-3">
-                    <label for="">Digite o codigo de rastreio: </label>
-                    <input type="text" name="rastreio" id="inputRastreio">
-                    <span id="errorMensagem" class="text-danger"></span>
-                </div>   
-                <div class="mb-3">
-                    <input type="checkbox" class="" id="checkboxDesabilitar" name="motoboy">
-                    <label class="form-check-label" for="checkboxDesabilitar">Motoboy</label>
-                </div>
+                    <div class="mb-3">
+                        <label for="">Digite o codigo de rastreio: </label>
+                        <input type="text" name="rastreio" id="inputRastreio">
+                        <span id="errorMensagem" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="checkbox" class="" id="checkboxDesabilitar" name="motoboy">
+                        <label class="form-check-label" for="checkboxDesabilitar">Motoboy</label>
+                    </div>
             </div>
-                
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 <button type="submit" class="btn btn-primary">Salvar</button>

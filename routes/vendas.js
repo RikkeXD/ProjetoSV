@@ -55,7 +55,7 @@ router.get('/', async (req, res) => {
                     status = "Pedido em transporte"
                     break
                 case 3:
-                    status = 'Pedido Entregue'
+                    status = 'Pedido Finalizado'
                     break
                 default:
                     status = "Erro no Status do pedido"
@@ -246,6 +246,8 @@ async function BuscaPedido(Idvenda) {
         if (pedidoJSON.qntd_parcela > 1) {
             parcela = pedidoJSON.qntd_parcela
             vlr_parcela = pedidoJSON.vlr_total / pedidoJSON.qntd_parcela
+        } else {
+            vlr_parcela = pedidoJSON.vlr_total
         }
 
         //Coletando dados da DATA e formatando
@@ -439,16 +441,21 @@ router.get('/:id/download', async (req, res) => {
         createCellWithLabel('Bairro:', `${cliente.bairro}`, destinatarioX, nomeY + 60, 260, nomeHeight);
         createCellWithLabel('CEP:', `${cliente.cep}`, destinatarioX + 260, nomeY + 60, 140, nomeHeight);
         createCellWithLabel('UF:', `${cliente.uf}`, destinatarioX + 400, nomeY + 60, 100, nomeHeight);
-        if(!cliente.complemento || cliente.complemento == null || cliente.complemento == undefined){
+        if (!cliente.complemento || cliente.complemento == null || cliente.complemento == undefined) {
             createCellWithLabel('Complemento', ``, destinatarioX, nomeY + 90, 500, nomeHeight);
-        }else{
+        } else {
             createCellWithLabel('Complemento', `${cliente.complemento}`, destinatarioX, nomeY + 90, 500, nomeHeight);
-        }   
-        
+        }
+
 
         doc.text('Dados da Compra', destinatarioX, novaPosicaoY + 130, { align: 'left' });
         createCellWithLabel('Forma de Pgto:', `${Infopedido.pagamento}`, destinatarioX, novaPosicaoY + 141, 200, nomeHeight);
-        createCellWithLabel('Parcelas:', `${Infopedido.parcela}`, destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
+        if (Infopedido.parcela > 1) {
+            createCellWithLabel('Parcelas:', `${Infopedido.parcela}`, destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
+        } else {
+            createCellWithLabel('Parcelas:', ``, destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
+        }
+
         createCellWithLabel('Modo de Envio:', `${Infopedido.frete}`, destinatarioX + 300, novaPosicaoY + 141, 200, nomeHeight);
 
         const tituloX = destinatarioX;
@@ -482,17 +489,20 @@ router.get('/:id/download', async (req, res) => {
             createCellWithLabelProduto(produto.total, null, produtoX + tituloWidth + 150 + 40 + 130, produtoCellY, 150, produtoHeight);
         });
 
-        // Adiciona o campo "Total" na mesma coluna que "Valor Total"
+        //Valor Frete
         createCellWithLabelTotal('Frete:', `${Infopedido.vlr_frete}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + produtos.length * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
-        if(Infopedido.parcela > 1){
+        if (Infopedido.parcela > 1) {
+            //Valor Parcela
+            createCellWithLabelTotal('Parcela:', `${Infopedido.vlr_parcela}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
+            //Valor Total
+            createCellWithLabelTotal('Valor Total:', `${Infopedido.vlr_total}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 2) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+        } else {
+            //Valor Total
+            createCellWithLabelTotal('Valor Total:', `${Infopedido.vlr_total}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
         }
-        //Valor Parcela
-        createCellWithLabelTotal('Parcela:', `${Infopedido.vlr_parcela}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
-        //Valor Total
-        createCellWithLabelTotal('Valor Total:', `${Infopedido.vlr_total}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 2) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
         //Pagina 2 do PDF
         doc.addPage()
@@ -508,22 +518,30 @@ router.get('/:id/download', async (req, res) => {
         doc.y = novaPosicaoY;
 
         doc.text('Destinatário/Remetente', destinatarioX, novaPosicaoY - 12, { align: 'left' });
-        doc.text('Pedido 7 /', destinatarioX + 350, novaPosicaoY - 12, { align: 'left' });
-        doc.text('Emissão 30/06/2023', destinatarioX + 398, novaPosicaoY - 12, { align: 'left' });
-        createCellWithLabel('Nome:', 'John Doe', destinatarioX, nomeY, nomeWidth, nomeHeight);
-        createCellWithLabel('Telefone:', '(123) 456-7890', destinatarioX + 200, nomeY, 130, nomeHeight);
-        createCellWithLabel('CPF:', '506.207.738-98', destinatarioX + 330, nomeY, 170, nomeHeight);
-        createCellWithLabel('Endereço:', '1234 Main St', destinatarioX, nomeY + 30, 330, nomeHeight);
-        createCellWithLabel('Número:', '123', destinatarioX + 330, nomeY + 30, 170, nomeHeight);
-        createCellWithLabel('Bairro:', 'Centro', destinatarioX, nomeY + 60, 260, nomeHeight);
-        createCellWithLabel('CEP:', '12345-678', destinatarioX + 260, nomeY + 60, 140, nomeHeight);
-        createCellWithLabel('UF:', 'SP', destinatarioX + 400, nomeY + 60, 100, nomeHeight);
-        createCellWithLabel('Complemento', 'CASA 2 Verde', destinatarioX, nomeY + 90, 500, nomeHeight);
+        doc.text(`Pedido ${Infopedido.numpedido} /`, destinatarioX + 350, novaPosicaoY - 12, { align: 'left' });
+        doc.text(`Emissão ${Infopedido.data}`, destinatarioX + 400, novaPosicaoY - 12, { align: 'left' });
+        createCellWithLabel('Nome:', `${cliente.nome} ${cliente.sobrenome}`, destinatarioX, nomeY, nomeWidth, nomeHeight);
+        createCellWithLabel('Telefone:', `${cliente.telefone}`, destinatarioX + 200, nomeY, 130, nomeHeight);
+        createCellWithLabel('CPF:', `${cliente.cpf}`, destinatarioX + 330, nomeY, 170, nomeHeight);
+        createCellWithLabel('Endereço:', `${cliente.endereco}`, destinatarioX, nomeY + 30, 330, nomeHeight);
+        createCellWithLabel('Número:', `${cliente.numero}`, destinatarioX + 330, nomeY + 30, 170, nomeHeight);
+        createCellWithLabel('Bairro:', `${cliente.bairro}`, destinatarioX, nomeY + 60, 260, nomeHeight);
+        createCellWithLabel('CEP:', `${cliente.cep}`, destinatarioX + 260, nomeY + 60, 140, nomeHeight);
+        createCellWithLabel('UF:', `${cliente.uf}`, destinatarioX + 400, nomeY + 60, 100, nomeHeight);
+        if (!cliente.complemento || cliente.complemento == null || cliente.complemento == undefined) {
+            createCellWithLabel('Complemento', ``, destinatarioX, nomeY + 90, 500, nomeHeight);
+        } else {
+            createCellWithLabel('Complemento', `${cliente.complemento}`, destinatarioX, nomeY + 90, 500, nomeHeight);
+        }
 
         doc.text('Dados da Compra', destinatarioX, novaPosicaoY + 130, { align: 'left' });
-        createCellWithLabel('Forma de Pgto:', 'Cartão de Crédito', destinatarioX, novaPosicaoY + 141, 200, nomeHeight);
-        createCellWithLabel('Parcelas:', '3', destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
-        createCellWithLabel('Modo de Envio:', 'Expresso', destinatarioX + 300, novaPosicaoY + 141, 200, nomeHeight);
+        createCellWithLabel('Forma de Pgto:', `${Infopedido.pagamento}`, destinatarioX, novaPosicaoY + 141, 200, nomeHeight);
+        if (Infopedido.parcela > 1) {
+            createCellWithLabel('Parcelas:', `${Infopedido.parcela}`, destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
+        } else {
+            createCellWithLabel('Parcelas:', ``, destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
+        }
+        createCellWithLabel('Modo de Envio:', `${Infopedido.frete}`, destinatarioX + 300, novaPosicaoY + 141, 200, nomeHeight);
 
 
         createCellWithLabelTitulo('Cod', null, tituloX, tituloY, tituloWidth, tituloHeight);
@@ -548,19 +566,24 @@ router.get('/:id/download', async (req, res) => {
             createCellWithLabelProduto(produto.total, null, produtoX + tituloWidth + 150 + 40 + 130, produtoCellY, 150, produtoHeight);
         });
 
-        // Adiciona o campo "Total" na mesma coluna que "Valor Total"
-        createCellWithLabelTotal('Frete:', 'R$ 15,89', produtosX + tituloWidth + 150 + 40 + 130, produtosY + produtos.length * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+        //Valor Frete
+        createCellWithLabelTotal('Frete:', `${Infopedido.vlr_frete}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + produtos.length * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
-        //Valor Parcela
-        createCellWithLabelTotal('Parcela:', 'R$ 150', produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+        if (Infopedido.parcela > 1) {
+            //Valor Parcela
+            createCellWithLabelTotal('Parcela:', `${Infopedido.vlr_parcela}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
-        //Valor Total
-        createCellWithLabelTotal('Valor Total:', 'R$ 450', produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 2) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+            //Valor Total
+            createCellWithLabelTotal('Valor Total:', `${Infopedido.vlr_total}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 2) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+        } else {
+            //Valor Total
+            createCellWithLabelTotal('Valor Total:', `${Infopedido.vlr_total}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+        }
 
-        doc.text('Assinatura', 50, 500, { align: 'left' });
+        doc.text('Assinatura', 50, 520, { align: 'left' });
 
-        doc.moveTo(50, 530) // Coordenadas do ponto de partida
-            .lineTo(550, 530) // Coordenadas do ponto de destino
+        doc.moveTo(50, 540) // Coordenadas do ponto de partida
+            .lineTo(550, 540) // Coordenadas do ponto de destino
             .stroke();
 
         // Evento de conclusão do stream
@@ -586,6 +609,7 @@ router.get('/:id/download', async (req, res) => {
         // Encerra o documento e finaliza o stream
         doc.end();
     }
+    
     catch (err) {
         req.flash('error_msg', 'Erro ao baixar o pedido')
         console.log("ERRO: ++++++++++++++++++++++ " + err)
@@ -594,4 +618,17 @@ router.get('/:id/download', async (req, res) => {
 
 })
 
+//Mudando o Status do pedido para finalizado
+router.get('/:id/finalizar', async (req, res) =>{
+    const status = await Vendas.update({
+        status: 3
+    }, {where: {id: req.params.id} }).then(() =>{
+        req.flash('success_msg', 'Pedido finalizado com sucesso!')
+        res.redirect(`/vendas/pedido/${req.params.id}`)
+    }).catch((err) =>{
+        console.log('ERRO AO FINALIZAR O PEDIDO ROTA /:ID/FINALIZAR' + err)
+        req.flash('error_msg', "Erro ao finalizar o pedido")
+        res.redirect(`/vendas/pedido/${req.params.id}`)
+    })
+})
 module.exports = router
