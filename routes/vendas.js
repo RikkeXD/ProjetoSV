@@ -227,7 +227,7 @@ router.post('/novopedido', async (req, res) => {
 
 async function BuscaPedido(Idvenda) {
     try {
-        //Coletando dados do cliente
+        //Coletando dados da venda
         const pedidoBD = await Vendas.findOne({ where: { id: Idvenda } })
         const pedidoJSON = pedidoBD.toJSON()
 
@@ -248,6 +248,10 @@ async function BuscaPedido(Idvenda) {
             vlr_parcela = pedidoJSON.vlr_total / pedidoJSON.qntd_parcela
         }
 
+        //Coletando dados da DATA e formatando
+        const dataBD = pedidoJSON.createdAt
+        const dataFormatada = moment(dataBD).format('DD/MM/YYYY')
+
         //Criando Pedido
         let pedido = []
         pedido.push({
@@ -259,7 +263,8 @@ async function BuscaPedido(Idvenda) {
             vlr_frete: pedidoJSON.vlr_frete.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
             vlr_total: pedidoJSON.vlr_total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
             cod_rastreio: pedidoJSON.cod_rastreio,
-            status: pedidoJSON.status
+            status: pedidoJSON.status,
+            data: dataFormatada
         })
 
         //Coletando Todos os produtos do pedido
@@ -280,13 +285,12 @@ async function BuscaPedido(Idvenda) {
             })
         }
 
-        console.log(pedido)
-
         return {
             pedido: pedidoJSON,
             cliente: infoclientes,
             pedido: pedido,
-            listprodutos: listprodutos
+            listprodutos: listprodutos,
+            vlr_parcela: vlr_parcela
         }
     } catch (err) {
         console.log("Ocorreu o erro: " + err)
@@ -297,10 +301,10 @@ async function BuscaPedido(Idvenda) {
 router.get('/pedido/:id', async (req, res) => {
     try {
         const pedidoInfo = await BuscaPedido(req.params.id)
-        const pedidoJSON = pedidoInfo.pedido
         const infoclientes = pedidoInfo.cliente
         const pedido = pedidoInfo.pedido
         const listprodutos = pedidoInfo.listprodutos
+        const vlr_parcela = pedidoInfo.vlr_parcela
 
         res.render('vendas/pedido', { produtos: listprodutos, cliente: infoclientes, pedido: pedido, vlr_parcela: vlr_parcela })
         //console.log(pedidoJSON)
@@ -343,6 +347,7 @@ router.post('/pedido/:id/status', async (req, res) => {
 })
 
 
+
 //Criação do PDF
 router.get('/:id/download', async (req, res) => {
     try {
@@ -355,6 +360,9 @@ router.get('/:id/download', async (req, res) => {
         //Coletando dados do pedido
         const DadosPedido = await BuscaPedido(req.params.id)
         const produtos = DadosPedido.listprodutos
+        const cliente = DadosPedido.cliente
+        const Infopedido = DadosPedido.pedido[0]
+        console.log(DadosPedido)
 
         //Criando um novo documento PDF
         const doc = new PDFdocument()
@@ -421,22 +429,27 @@ router.get('/:id/download', async (req, res) => {
         const nomeHeight = 28; //Altura das Bordas
 
         doc.text('Destinatário/Remetente', destinatarioX, novaPosicaoY - 12, { align: 'left' });
-        doc.text('Pedido 7 /', destinatarioX + 350, novaPosicaoY - 12, { align: 'left' });
-        doc.text('Emissão 30/06/2023', destinatarioX + 400, novaPosicaoY - 12, { align: 'left' });
-        createCellWithLabel('Nome:', 'John Doe', destinatarioX, nomeY, nomeWidth, nomeHeight);
-        createCellWithLabel('Telefone:', '(123) 456-7890', destinatarioX + 200, nomeY, 130, nomeHeight);
-        createCellWithLabel('CPF:', '506.207.738-98', destinatarioX + 330, nomeY, 170, nomeHeight);
-        createCellWithLabel('Endereço:', '1234 Main St', destinatarioX, nomeY + 30, 330, nomeHeight);
-        createCellWithLabel('Número:', '123', destinatarioX + 330, nomeY + 30, 170, nomeHeight);
-        createCellWithLabel('Bairro:', 'Centro', destinatarioX, nomeY + 60, 260, nomeHeight);
-        createCellWithLabel('CEP:', '12345-678', destinatarioX + 260, nomeY + 60, 140, nomeHeight);
-        createCellWithLabel('UF:', 'SP', destinatarioX + 400, nomeY + 60, 100, nomeHeight);
-        createCellWithLabel('Complemento', 'CASA 2 Verde', destinatarioX, nomeY + 90, 500, nomeHeight);
+        doc.text(`Pedido ${Infopedido.numpedido} /`, destinatarioX + 350, novaPosicaoY - 12, { align: 'left' });
+        doc.text(`Emissão ${Infopedido.data}`, destinatarioX + 400, novaPosicaoY - 12, { align: 'left' });
+        createCellWithLabel('Nome:', `${cliente.nome} ${cliente.sobrenome}`, destinatarioX, nomeY, nomeWidth, nomeHeight);
+        createCellWithLabel('Telefone:', `${cliente.telefone}`, destinatarioX + 200, nomeY, 130, nomeHeight);
+        createCellWithLabel('CPF:', `${cliente.cpf}`, destinatarioX + 330, nomeY, 170, nomeHeight);
+        createCellWithLabel('Endereço:', `${cliente.endereco}`, destinatarioX, nomeY + 30, 330, nomeHeight);
+        createCellWithLabel('Número:', `${cliente.numero}`, destinatarioX + 330, nomeY + 30, 170, nomeHeight);
+        createCellWithLabel('Bairro:', `${cliente.bairro}`, destinatarioX, nomeY + 60, 260, nomeHeight);
+        createCellWithLabel('CEP:', `${cliente.cep}`, destinatarioX + 260, nomeY + 60, 140, nomeHeight);
+        createCellWithLabel('UF:', `${cliente.uf}`, destinatarioX + 400, nomeY + 60, 100, nomeHeight);
+        if(!cliente.complemento || cliente.complemento == null || cliente.complemento == undefined){
+            createCellWithLabel('Complemento', ``, destinatarioX, nomeY + 90, 500, nomeHeight);
+        }else{
+            createCellWithLabel('Complemento', `${cliente.complemento}`, destinatarioX, nomeY + 90, 500, nomeHeight);
+        }   
+        
 
         doc.text('Dados da Compra', destinatarioX, novaPosicaoY + 130, { align: 'left' });
-        createCellWithLabel('Forma de Pgto:', 'Cartão de Crédito', destinatarioX, novaPosicaoY + 141, 200, nomeHeight);
-        createCellWithLabel('Parcelas:', '3', destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
-        createCellWithLabel('Modo de Envio:', 'Expresso', destinatarioX + 300, novaPosicaoY + 141, 200, nomeHeight);
+        createCellWithLabel('Forma de Pgto:', `${Infopedido.pagamento}`, destinatarioX, novaPosicaoY + 141, 200, nomeHeight);
+        createCellWithLabel('Parcelas:', `${Infopedido.parcela}`, destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
+        createCellWithLabel('Modo de Envio:', `${Infopedido.frete}`, destinatarioX + 300, novaPosicaoY + 141, 200, nomeHeight);
 
         const tituloX = destinatarioX;
         const tituloY = novaPosicaoY + 190;
@@ -470,6 +483,72 @@ router.get('/:id/download', async (req, res) => {
         });
 
         // Adiciona o campo "Total" na mesma coluna que "Valor Total"
+        createCellWithLabelTotal('Frete:', `${Infopedido.vlr_frete}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + produtos.length * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+
+        if(Infopedido.parcela > 1){
+
+        }
+        //Valor Parcela
+        createCellWithLabelTotal('Parcela:', `${Infopedido.vlr_parcela}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 1) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+
+        //Valor Total
+        createCellWithLabelTotal('Valor Total:', `${Infopedido.vlr_total}`, produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 2) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+
+        //Pagina 2 do PDF
+        doc.addPage()
+        doc.text('M.A SAUDE E VIDA', 50, 50, { align: 'left' });
+        doc.text('CNPJ:13.822.074/0001-55', 50, 65, { align: 'left' });
+
+
+        // Verifica se o arquivo da imagem existe
+        if (fs.existsSync(imagePath)) {
+            doc.image(imagePath, imageX, imageY, { width: 400 });
+        }
+
+        doc.y = novaPosicaoY;
+
+        doc.text('Destinatário/Remetente', destinatarioX, novaPosicaoY - 12, { align: 'left' });
+        doc.text('Pedido 7 /', destinatarioX + 350, novaPosicaoY - 12, { align: 'left' });
+        doc.text('Emissão 30/06/2023', destinatarioX + 398, novaPosicaoY - 12, { align: 'left' });
+        createCellWithLabel('Nome:', 'John Doe', destinatarioX, nomeY, nomeWidth, nomeHeight);
+        createCellWithLabel('Telefone:', '(123) 456-7890', destinatarioX + 200, nomeY, 130, nomeHeight);
+        createCellWithLabel('CPF:', '506.207.738-98', destinatarioX + 330, nomeY, 170, nomeHeight);
+        createCellWithLabel('Endereço:', '1234 Main St', destinatarioX, nomeY + 30, 330, nomeHeight);
+        createCellWithLabel('Número:', '123', destinatarioX + 330, nomeY + 30, 170, nomeHeight);
+        createCellWithLabel('Bairro:', 'Centro', destinatarioX, nomeY + 60, 260, nomeHeight);
+        createCellWithLabel('CEP:', '12345-678', destinatarioX + 260, nomeY + 60, 140, nomeHeight);
+        createCellWithLabel('UF:', 'SP', destinatarioX + 400, nomeY + 60, 100, nomeHeight);
+        createCellWithLabel('Complemento', 'CASA 2 Verde', destinatarioX, nomeY + 90, 500, nomeHeight);
+
+        doc.text('Dados da Compra', destinatarioX, novaPosicaoY + 130, { align: 'left' });
+        createCellWithLabel('Forma de Pgto:', 'Cartão de Crédito', destinatarioX, novaPosicaoY + 141, 200, nomeHeight);
+        createCellWithLabel('Parcelas:', '3', destinatarioX + 200, novaPosicaoY + 141, 100, nomeHeight);
+        createCellWithLabel('Modo de Envio:', 'Expresso', destinatarioX + 300, novaPosicaoY + 141, 200, nomeHeight);
+
+
+        createCellWithLabelTitulo('Cod', null, tituloX, tituloY, tituloWidth, tituloHeight);
+        createCellWithLabelTitulo('Produto', null, tituloX + tituloWidth, tituloY, 150, tituloHeight);
+        createCellWithLabelTitulo('Qtd', null, tituloX + tituloWidth + 150, tituloY, 40, tituloHeight);
+        createCellWithLabelTitulo('Valor Unitário', null, tituloX + tituloWidth + 150 + 40, tituloY, 130, tituloHeight);
+        createCellWithLabelTitulo('Valor Total', null, tituloX + tituloWidth + 150 + 40 + 130, tituloY, 150, tituloHeight);
+
+
+        //Cria a borda para os produtos
+        createBorderedCell(produtosX, produtosY, 500, produtoHeight);
+
+        //Cria as células para cada produto
+        produtos.forEach((produto, index) => {
+            const produtoX = produtosX;
+            const produtoCellY = produtosY + index * (produtoHeight + espacoVerticalProdutos);
+
+            createCellWithLabelProduto(produto.id, null, produtoX, produtoCellY, tituloWidth, produtoHeight);
+            createCellWithLabelProduto(produto.produto, null, produtoX + tituloWidth, produtoCellY, 150, produtoHeight);
+            createCellWithLabelProduto(produto.qntd, null, produtoX + tituloWidth + 150, produtoCellY, 40, produtoHeight);
+            createCellWithLabelProduto(produto.vlr_uni, null, produtoX + tituloWidth + 150 + 40, produtoCellY, 130, produtoHeight);
+            createCellWithLabelProduto(produto.total, null, produtoX + tituloWidth + 150 + 40 + 130, produtoCellY, 150, produtoHeight);
+        });
+
+        // Adiciona o campo "Total" na mesma coluna que "Valor Total"
         createCellWithLabelTotal('Frete:', 'R$ 15,89', produtosX + tituloWidth + 150 + 40 + 130, produtosY + produtos.length * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
 
         //Valor Parcela
@@ -477,6 +556,12 @@ router.get('/:id/download', async (req, res) => {
 
         //Valor Total
         createCellWithLabelTotal('Valor Total:', 'R$ 450', produtosX + tituloWidth + 150 + 40 + 130, produtosY + (produtos.length + 2) * (produtoHeight + espacoVerticalProdutos + 2), 150, produtoHeight + 5);
+
+        doc.text('Assinatura', 50, 500, { align: 'left' });
+
+        doc.moveTo(50, 530) // Coordenadas do ponto de partida
+            .lineTo(550, 530) // Coordenadas do ponto de destino
+            .stroke();
 
         // Evento de conclusão do stream
         stream.on('finish', () => {
@@ -496,7 +581,7 @@ router.get('/:id/download', async (req, res) => {
             });
         });
 
-        
+
 
         // Encerra o documento e finaliza o stream
         doc.end();
