@@ -1,6 +1,8 @@
 const express = require('express')
 const Usuario = require('../models/Usuario')
 const router = express.Router()
+const bcrypt = require('bcrypt')
+const { password } = require('../config/database')
 
 router.get('/cadastro', (req, res) => {
     res.render('usuarios/cadastrouser')
@@ -27,6 +29,16 @@ router.post('/cadastro', async (req, res) => {
     if (req.body.senha != req.body.senha2) {
         erro.push({ texto: 'As senhas não são iguais' })
     }
+    //Validando se existe o usuario já cadastrado
+    const userExist = await Usuario.findOne({where: {email: req.body.email}})
+    if(userExist){
+        erro.push({texto: 'Usuario já existe'})
+    }
+
+    //Criando Password
+    const salt = await bcrypt.genSalt(12)
+    const senhaHash = await bcrypt.hash(req.body.senha, salt)
+
     if (erro.length > 0) {
         res.render('usuarios/cadastrouser', { erro: erro, usuario:usuario })
     } else {
@@ -35,7 +47,7 @@ router.post('/cadastro', async (req, res) => {
             nome: req.body.nome,
             sobrenome: req.body.sobrenome,
             email: req.body.email,
-            senha: req.body.senha
+            senha: senhaHash
         }).then(() => {
             req.flash('success_msg', 'Usuario criado com sucesso!')
             res.redirect('/home')
@@ -82,6 +94,9 @@ router.post('/edit', async (req, res) => {
     if (!req.body.email || typeof req.body.email == undefined || req.body.email == null) {
         erro.push({ texto: 'Email invalido !' })
     }
+
+    
+
     if (erro.length > 0) {
         res.render('usuarios/editusuario', { erro: erro, usuario:usuario})
     } else {
