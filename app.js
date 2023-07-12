@@ -14,78 +14,145 @@ const produtos = require('./routes/produtos')
 const vendas = require('./routes/vendas')
 const moment = require('moment') //Biblioteca para ajuda na formatação das Datas
 const bcrypt = require('bcrypt')
+require('dotenv').config()
+const jwt = require('jsonwebtoken')
+const Usuario = require('./models/Usuario')
 
 
 //Configurações
-    //Banco de Dados
-    require('./database')
-    //Configurando para utilizar JSON
-        app.use(express.json())
+//Banco de Dados
+require('./database')
+//Configurando para utilizar JSON
+app.use(express.json())
 
-    //Handlebars
-    const hbs = exphbs.create({
-        defaultLayout: 'main', 
-        helpers: {
-            stringify: (obj) => {
-                return JSON.stringify(obj)
-            },
-            eq: function (a, b, options){
-                if (a === b){
-                    if(typeof options.fn === 'function'){
-                        return options.fn(this)
-                    }
-                } else{
-                    if(typeof options.inverse === 'function'){
-                        return options.inverse(this)
-                    }
-                    return ''
+//Handlebars
+const hbs = exphbs.create({
+    defaultLayout: 'main',
+    helpers: {
+        stringify: (obj) => {
+            return JSON.stringify(obj)
+        },
+        eq: function (a, b, options) {
+            if (a === b) {
+                if (typeof options.fn === 'function') {
+                    return options.fn(this)
                 }
+            } else {
+                if (typeof options.inverse === 'function') {
+                    return options.inverse(this)
+                }
+                return ''
             }
         }
+    }
+})
+
+handlebars.registerHelper('isStatusOne', function (status) {
+    return status === 1;
+});
+
+handlebars.registerHelper('isStatusEnd', function (status) {
+    return status === 2;
+});
+
+handlebars.registerHelper('isMotoboy', function (value, options) {
+    if (value === 'Motoboy') {
+        return options.fn(this);
+    } else {
+        return options.inverse(this);
+    }
+});
+
+app.engine('handlebars', hbs.engine)
+app.set('view engine', 'handlebars')
+
+// Public
+app.use(express.static(path.join(__dirname, 'public')))
+//Body-Parser
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+//Sessão 
+app.use(session({
+    secret: 'SaudeVida',
+    resave: true,
+    saveUninitialized: true
+}))
+//Flash (Mensagens Temporaria)
+app.use(flash())
+//MiddleWares
+app.use((req, res, next) => {
+    res.locals.success_msg = req.flash('success_msg')
+    res.locals.error_msg = req.flash('error_msg')
+
+    next()
+})
+//Rotas
+app.get('/', async (req, res) => {
+
+    res.render('usuarios/login', { hideNavBar: true })
+
+    const usuario = await Usuario.findOne({})
+
+})
+
+app.post("/auth", async (req, res) => {
+    const email = req.body.email
+    const senha = req.body.senha
+
+    const usuario = await Usuario.findOne({
+        where: { email: email }
     })
 
-    handlebars.registerHelper('isStatusOne', function(status) {
-        return status === 1;
-      });
+    if (!usuario || usuario == null || usuario == undefined) {
+        req.flash('error_msg', 'Usuario não encontrado')
+        res.redirect('/')
+    }
+    const checkPassword = await bcrypt.compare(senha, usuario.senha)
 
-    handlebars.registerHelper('isStatusEnd', function(status) {
-        return status === 2;
-      });
+    if (!checkPassword) {
+        req.flash('error_msg', 'Senha incorreta')
+        res.redirect('/')
+    }
 
-    handlebars.registerHelper('isMotoboy', function (value, options) {
-        if (value === 'Motoboy') {
-          return options.fn(this);
-        } else {
-          return options.inverse(this);
-        }
-      });
+    try {
+        const secret = process.env.SECRET
 
-        app.engine('handlebars', hbs.engine)
-        app.set('view engine', 'handlebars')
+        const token = jwt.sign({
+            id: usuario.id,
+            nome: usuario.nome,
+        }, secret,)
+        
+        //sessionStorage.setItem('token', token)
+        req.session.token = token
+        res.render('home/home', {token: token})
 
-    // Public
-        app.use(express.static(path.join(__dirname,'public')))
-    //Body-Parser
-        app.use(bodyParser.urlencoded({extended: true}))
-        app.use(bodyParser.json())
-    //Sessão 
-        app.use(session({
-            secret: 'SaudeVida',
-            resave: true,
-            saveUninitialized: true
-        }))
-    //Flash (Mensagens Temporaria)
-        app.use(flash())
-    //MiddleWares
-        app.use((req, res, next) =>{
-          res.locals.success_msg = req.flash('success_msg')
-          res.locals.error_msg = req.flash('error_msg')
+    } catch (err) {
+        req.flash('error_msg', 'Ocorreu um erro, tente mais tarde')
+        res.redirect('/')
+    }
 
-           next()
-        })
-    //Rotas
-    app.get('/', (req,res)=> {
-        res.render('usuarios/login',{hideNavBar: true})
+})
+
+function checkToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+
+    if (!token) {
+        return res.status(401).json({ error: 'Não autorizado' })
+    }
+
+    try {
+        const secret = process.env.SECRET
+
+        jwt.verify(token, secret)
+
+        next()
+    } catch (err) {
+        return res.status(401).json({ error: 'Não autorizado' })
+    }
+}
+    app.get('/teste', checkToken, (req, res) => {
+        res.render('home/home')
     })
 
     //Importando Rotas
@@ -94,7 +161,7 @@ const bcrypt = require('bcrypt')
     app.use('/clientes', clientes)
     app.use('/produtos', produtos)
     app.use('/vendas', vendas)
-    
+
     //Servidor
     const port = 8081
-    app.listen(port, ()=> console.log(`Servidor iniciado na porta ${port}`))
+    app.listen(port, () => console.log(`Servidor iniciado na porta ${port}`))

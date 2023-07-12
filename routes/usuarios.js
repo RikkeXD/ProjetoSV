@@ -2,7 +2,7 @@ const express = require('express')
 const Usuario = require('../models/Usuario')
 const router = express.Router()
 const bcrypt = require('bcrypt')
-const { password } = require('../config/database')
+
 
 router.get('/cadastro', (req, res) => {
     res.render('usuarios/cadastrouser')

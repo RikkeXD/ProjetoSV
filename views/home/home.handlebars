@@ -17,7 +17,34 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.5.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
   <script>
-    $(document).ready(function() {
+
+    //TOKEN
+    function enviarRequisicaoComToken(url, metodo, dados = {}) {
+      // Obtém o token armazenado na sessionStorage
+      const token = sessionStorage.getItem('token');
+
+      // Define o cabeçalho de autorização com o token
+      const headers = {
+        Authorization: `Bearer ${token}`
+      };
+
+      // Configura as opções da requisição, incluindo o cabeçalho
+      const options = {
+        method: metodo,
+        headers: headers,
+        body: JSON.stringify(dados)
+      };
+
+      // Envia a requisição para a URL especificada
+      return fetch(url, options)
+        .then(response => response.json())
+        .catch(error => {
+          console.error('Erro na requisição:', error);
+          throw error;
+        });
+    }
+
+    $(document).ready(function () {
       // Obter dados das vendas (exemplo)
       var salesData = {
         labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'],
