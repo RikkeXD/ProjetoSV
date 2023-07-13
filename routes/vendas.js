@@ -10,6 +10,9 @@ const { where } = require('sequelize')
 const PDFdocument = require('pdfkit')
 const fs = require('fs')
 const path = require('path')
+const {checkToken} = require('../app')
+require('dotenv').config()
+const jwt = require('jsonwebtoken')
 
 async function BuscandoNomePorId(id) {
     try {

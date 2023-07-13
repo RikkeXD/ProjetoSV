@@ -19,33 +19,27 @@
   <script>
 
     //TOKEN
-    function enviarRequisicaoComToken(url, metodo, dados = {}) {
-      // Obtém o token armazenado na sessionStorage
-      const token = sessionStorage.getItem('token');
-
-      // Define o cabeçalho de autorização com o token
-      const headers = {
-        Authorization: `Bearer ${token}`
-      };
-
-      // Configura as opções da requisição, incluindo o cabeçalho
-      const options = {
-        method: metodo,
-        headers: headers,
-        body: JSON.stringify(dados)
-      };
-
-      // Envia a requisição para a URL especificada
-      return fetch(url, options)
+    //
+    function getToken() {
+      return fetch('/getToken')
         .then(response => response.json())
+        .then(data => data.token)
         .catch(error => {
-          console.error('Erro na requisição:', error);
+          console.error('Erro ao obter o token:', error);
           throw error;
         });
     }
 
+    // Chama a função para obter o token e realizar as ações necessárias
+    getToken()
+      .then(token => {
+        
+        sessionStorage.setItem('token ', token);
+        console.log("TOKEN AUTENTICAÇÃO HOME "+ token);
+      });
+
     $(document).ready(function () {
-      // Obter dados das vendas (exemplo)
+      //Obter dados das vendas (exemplo)
       var salesData = {
         labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'],
         datasets: [{

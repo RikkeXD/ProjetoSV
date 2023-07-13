@@ -17,6 +17,7 @@ const bcrypt = require('bcrypt')
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const Usuario = require('./models/Usuario')
+const { serialize } = require('v8')
 
 
 //Configurações
@@ -121,10 +122,9 @@ app.post("/auth", async (req, res) => {
             id: usuario.id,
             nome: usuario.nome,
         }, secret,)
-        
-        //sessionStorage.setItem('token', token)
+
         req.session.token = token
-        res.render('home/home', {token: token})
+        res.render('home/home', { token: token, sessionToken: req.session.token })
 
     } catch (err) {
         req.flash('error_msg', 'Ocorreu um erro, tente mais tarde')
@@ -133,35 +133,45 @@ app.post("/auth", async (req, res) => {
 
 })
 
+//Verificando TOKEN
+
 function checkToken(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-
-    if (!token) {
-        return res.status(401).json({ error: 'Não autorizado' })
-    }
-
-    try {
+        const token = req.session.token
         const secret = process.env.SECRET
 
+    try {
         jwt.verify(token, secret)
+        console.log('Autenticado com sucesso')
 
         next()
     } catch (err) {
-        return res.status(401).json({ error: 'Não autorizado' })
+        console.log('ERRO NA AUTENTICAÇÃO', err)
+        req.flash('error_msg', 'Acesso não permitido! Por favor faça login!')
+        res.redirect('/')
     }
+
 }
-    app.get('/teste', checkToken, (req, res) => {
-        res.render('home/home')
-    })
 
-    //Importando Rotas
-    app.use('/usuarios', usuarios)
-    app.use('/home', home)
-    app.use('/clientes', clientes)
-    app.use('/produtos', produtos)
-    app.use('/vendas', vendas)
+app.get('/teste', checkToken, (req, res) => {
+    const token = req.session.token
+    const secret = process.env.SECRET
 
-    //Servidor
-    const port = 8081
-    app.listen(port, () => console.log(`Servidor iniciado na porta ${port}`))
+    const decodedToken = jwt.verify(token, secret)
+    const userId = decodedToken.id
+    console.log('ID DO USUARIO > ', userId)
+    res.render('home/teste')
+})
+
+
+//Importando Rotas
+app.use('/usuarios', checkToken,usuarios)
+app.use('/home', checkToken,home)
+app.use('/clientes', checkToken,clientes)
+app.use('/produtos', checkToken,produtos)
+app.use('/vendas', checkToken ,vendas)
+
+app.use(checkToken);
+
+//Servidor
+const port = 8081
+app.listen(port, () => console.log(`Servidor iniciado na porta ${port}`))
