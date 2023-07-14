@@ -141,8 +141,6 @@ function checkToken(req, res, next) {
 
     try {
         jwt.verify(token, secret)
-        console.log('Autenticado com sucesso')
-
         next()
     } catch (err) {
         console.log('ERRO NA AUTENTICAÇÃO', err)

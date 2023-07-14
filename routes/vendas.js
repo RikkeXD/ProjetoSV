@@ -10,7 +10,7 @@ const { where } = require('sequelize')
 const PDFdocument = require('pdfkit')
 const fs = require('fs')
 const path = require('path')
-const {checkToken} = require('../app')
+const { checkToken } = require('../app')
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
     try {
         const pedidos = await Vendas.findAll({})
         const pedidosJSON = pedidos.map(pedido => pedido.toJSON())
-        //console.log(pedidosJSON)
+    
         const TodosPedidos = []
         for (const pedido of pedidosJSON) {
             const pedidoid = pedido.id
@@ -64,14 +64,12 @@ router.get('/', async (req, res) => {
                     status = "Erro no Status do pedido"
             }
 
-
             //Formatando DATA
             const dataBD = pedido.createdAt
             const dataFormatada = moment(dataBD).format('DD/MM/YYYY')
 
             //Formatando Valor total
             const total_formatado = `R$ ${vlr_total.toFixed(2).replace('.', ',')}`
-
 
             //Buscando Nome, atraves do ID e Armazenando o NOME
             const NomeCliente = await BuscandoNomePorId(clienteId)
@@ -88,11 +86,7 @@ router.get('/', async (req, res) => {
             })
         }
 
-
-
-
         const NomePagamento = await BuscandoPagamento(1)
-        //console.log("Nome função" + NameFuction)
         res.render('vendas/vendas', { pedidos: TodosPedidos })
     } catch (err) {
         console.log(err)
@@ -173,22 +167,23 @@ router.post('/novopedido', async (req, res) => {
         return produto.id && produto.nome && produto.vlr && produto.qntd && produto.idIndex;
     });
 
-
-
     if (!camposPreenchidos) {
         erros.push({ texto: 'Erro nos produtos' })
     }
 
-
-
-
     if (erros.length > 0) {
         res.status(400).json({ erros: erros })
     } else {
-        const VendedorID = 1
+
+        //Buscando ID do usuario
+        const token = req.session.token
+        const secret = process.env.SECRET
+
+        const decodedToken = jwt.verify(token, secret)
+        const userId = decodedToken.id
         try {
             const vendas = await Vendas.create({
-                vendedor_id: VendedorID,
+                vendedor_id: userId,
                 cliente_id: Clienteid,
                 pagamento_id: Pagamentoid,
                 qntd_parcela: QntdParcela,
@@ -312,7 +307,6 @@ router.get('/pedido/:id', async (req, res) => {
         const vlr_parcela = pedidoInfo.vlr_parcela
 
         res.render('vendas/pedido', { produtos: listprodutos, cliente: infoclientes, pedido: pedido, vlr_parcela: vlr_parcela })
-        //console.log(pedidoJSON)
     } catch (erro) {
         console.log("Ocorreu o seguinte erro: " + erro)
     }
@@ -367,7 +361,6 @@ router.get('/:id/download', async (req, res) => {
         const produtos = DadosPedido.listprodutos
         const cliente = DadosPedido.cliente
         const Infopedido = DadosPedido.pedido[0]
-        console.log(DadosPedido)
 
         //Criando um novo documento PDF
         const doc = new PDFdocument()
@@ -445,9 +438,9 @@ router.get('/:id/download', async (req, res) => {
         createCellWithLabel('CEP:', `${cliente.cep}`, destinatarioX + 260, nomeY + 60, 140, nomeHeight);
         createCellWithLabel('UF:', `${cliente.uf}`, destinatarioX + 400, nomeY + 60, 100, nomeHeight);
         if (!cliente.complemento || cliente.complemento == null || cliente.complemento == undefined) {
-            createCellWithLabel('Complemento', ``, destinatarioX, nomeY + 90, 500, nomeHeight);
+            createCellWithLabel('Complemento:', ``, destinatarioX, nomeY + 90, 500, nomeHeight);
         } else {
-            createCellWithLabel('Complemento', `${cliente.complemento}`, destinatarioX, nomeY + 90, 500, nomeHeight);
+            createCellWithLabel('Complemento:', `${cliente.complemento}`, destinatarioX, nomeY + 90, 500, nomeHeight);
         }
 
 
@@ -532,9 +525,9 @@ router.get('/:id/download', async (req, res) => {
         createCellWithLabel('CEP:', `${cliente.cep}`, destinatarioX + 260, nomeY + 60, 140, nomeHeight);
         createCellWithLabel('UF:', `${cliente.uf}`, destinatarioX + 400, nomeY + 60, 100, nomeHeight);
         if (!cliente.complemento || cliente.complemento == null || cliente.complemento == undefined) {
-            createCellWithLabel('Complemento', ``, destinatarioX, nomeY + 90, 500, nomeHeight);
+            createCellWithLabel('Complemento:', ``, destinatarioX, nomeY + 90, 500, nomeHeight);
         } else {
-            createCellWithLabel('Complemento', `${cliente.complemento}`, destinatarioX, nomeY + 90, 500, nomeHeight);
+            createCellWithLabel('Complemento:', `${cliente.complemento}`, destinatarioX, nomeY + 90, 500, nomeHeight);
         }
 
         doc.text('Dados da Compra', destinatarioX, novaPosicaoY + 130, { align: 'left' });
@@ -607,12 +600,10 @@ router.get('/:id/download', async (req, res) => {
             });
         });
 
-
-
         // Encerra o documento e finaliza o stream
         doc.end();
     }
-    
+
     catch (err) {
         req.flash('error_msg', 'Erro ao baixar o pedido')
         console.log("ERRO: ++++++++++++++++++++++ " + err)
@@ -622,13 +613,13 @@ router.get('/:id/download', async (req, res) => {
 })
 
 //Mudando o Status do pedido para finalizado
-router.get('/:id/finalizar', async (req, res) =>{
+router.get('/:id/finalizar', async (req, res) => {
     const status = await Vendas.update({
         status: 3
-    }, {where: {id: req.params.id} }).then(() =>{
+    }, { where: { id: req.params.id } }).then(() => {
         req.flash('success_msg', 'Pedido finalizado com sucesso!')
         res.redirect(`/vendas/pedido/${req.params.id}`)
-    }).catch((err) =>{
+    }).catch((err) => {
         console.log('ERRO AO FINALIZAR O PEDIDO ROTA /:ID/FINALIZAR' + err)
         req.flash('error_msg', "Erro ao finalizar o pedido")
         res.redirect(`/vendas/pedido/${req.params.id}`)
