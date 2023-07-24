@@ -1,33 +1,51 @@
-<section class="vh-100" style="background-color: #88898a;">
-  <div class="container py-5 h-100">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-        <div class="card shadow-2-strong" style="border-radius: 1rem;">
-          <div class="card-body p-5 text-center">
-            <form action="/auth" method="post">
-            <h3 class="mb-5">Entrar</h3>
+<!DOCTYPE html>
+<html>
 
-            <div class="form-outline mb-4">
-              <input type="email" id="typeEmailX-2" class="form-control form-control-lg" name="email" />
-              <label class="form-label" for="typeEmailX-2">Email</label>
-            </div>
+<head>
+  <title>Sua Página</title>
+  <style>
+    /* Estilos para cobrir todo o fundo com a cor cinza */
+    body {
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      background-color: #88898a;
+      overflow: hidden;
+    }
+  </style>
+</head>
 
-            <div class="form-outline mb-4">
-              <input type="password" id="typePasswordX-2" class="form-control form-control-lg" name="senha" />
-              <label class="form-label" for="typePasswordX-2">Senha</label>
-            </div>
+<body>
+  <section class="vh-100">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+          <div class="card shadow-2-strong" style="border-radius: 1rem;">
+            <div class="card-body p-5 text-center">
+              <form action="/auth" method="post">
+                <h3 class="mb-5">Entrar</h3>
+                <div class="form-outline mb-4">
+                  <input type="email" id="typeEmailX-2" class="form-control form-control-lg" name="email" />
+                  <label class="form-label" for="typeEmailX-2">Email</label>
+                </div>
 
-            <!-- Checkbox -->
-            <div class="form-check d-flex justify-content-start mb-4">
-              <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
-              <label class="form-check-label" for="form1Example3"> Lembrar senha </label>
+                <div class="form-outline mb-4">
+                  <input type="password" id="typePasswordX-2" class="form-control form-control-lg" name="senha" />
+                  <label class="form-label" for="typePasswordX-2">Senha</label>
+                </div>
+                <div class="form-check d-flex justify-content-start mb-4">
+                  <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
+                  <label class="form-check-label" for="form1Example3"> Lembrar senha </label>
+                </div>
+                <hr class="my-4">
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+              </form>
             </div>
-            <hr class="my-4">
-            <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
-            </form>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+</body>
+</html>

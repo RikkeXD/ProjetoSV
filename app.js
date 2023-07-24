@@ -134,7 +134,6 @@ app.post("/auth", async (req, res) => {
 })
 
 //Verificando TOKEN
-
 function checkToken(req, res, next) {
         const token = req.session.token
         const secret = process.env.SECRET
@@ -149,7 +148,6 @@ function checkToken(req, res, next) {
     }
 
 }
-
 app.get('/teste', checkToken, (req, res) => {
     const token = req.session.token
     const secret = process.env.SECRET
@@ -159,8 +157,6 @@ app.get('/teste', checkToken, (req, res) => {
     console.log('ID DO USUARIO > ', userId)
     res.render('home/teste')
 })
-
-
 //Importando Rotas
 app.use('/usuarios', checkToken,usuarios)
 app.use('/home', checkToken,home)
