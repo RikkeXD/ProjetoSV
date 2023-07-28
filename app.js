@@ -104,17 +104,18 @@ app.post("/auth", async (req, res) => {
         where: { email: email }
     })
 
-    if (!usuario || usuario == null || usuario == undefined) {
+    if (usuario == null) {
         req.flash('error_msg', 'Usuario não encontrado')
-        res.redirect('/')
+        return res.redirect('/')
     }
-    const checkPassword = await bcrypt.compare(senha, usuario.senha)
-
-    if (!checkPassword) {
+    let checkPassword = false
+    if(usuario && usuario.senha){
+        checkPassword = await bcrypt.compare(senha, usuario.senha)
+    }
+    if(!checkPassword){
         req.flash('error_msg', 'Senha incorreta')
-        res.redirect('/')
+        return res.redirect('/')
     }
-
     try {
         const secret = process.env.SECRET
 
