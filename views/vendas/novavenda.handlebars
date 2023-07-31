@@ -111,8 +111,9 @@
                             <select class="form-select" aria-label="Forma de Pagamento" id="pagamento">
                                 <option disabled selected value="0">Selecione a forma de pagamento</option>
                                 <option value="1">Cartão de Credito</option>
-                                <option value="2">Cartão de Debito</option>
-                                <option value="3">Pix</option>
+                                <option value="2">Boleto</option>
+                                <option value="3">Cartão de Crédito</option>
+                                <option value="4">Pix</option>
                             </select>
                         </div>
                         <div class="col col-lg-2">
@@ -309,7 +310,7 @@
                 //Forma de pagamento
 
                 function AtualizarParcela() {
-                    if (pagamento.value == 1) {
+                    if (pagamento.value == 1 || pagamento.value == 2) {
                         var QntdParcela = document.getElementById('qntdParcela').value
                         if (QntdParcela > 0) {
                             var Elementototal = document.getElementById('total')
@@ -335,13 +336,14 @@
                         var pagamento = parseInt(this.value);
                         var LinhaParcela = total.querySelector('.parcela');
 
-                        if (pagamento === 1 && !LinhaParcela) {
+                        if (pagamento <= 2 && !LinhaParcela) {
+
                             qntdParcela.disabled = false
                             criarParcela(total);
                             AtualizarParcela()
                             criarTotal(total)
 
-                        } else if (LinhaParcela) {
+                        } else if (pagamento > 2 && LinhaParcela) {
                             removerParcela(LinhaParcela);
                             qntdParcela.disabled = true
                         }
@@ -364,7 +366,6 @@
 
                         LinhaParcela.appendChild(celulaParcela);
                         LinhaParcela.appendChild(celulaParcela2)
-                        //total.appendChild(LinhaParcela);
                         total.insertBefore(LinhaParcela, total.lastElementChild);
                     }
 

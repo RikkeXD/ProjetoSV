@@ -6,6 +6,8 @@ const { Op } = require('sequelize')
 router.get('/cadastro', (req, res) => {
     res.render('clientes/cadastroclientes')
 })
+require('dotenv').config()
+const jwt = require('jsonwebtoken')
 
 router.post('/cadastro', async (req, res) => {
     var erros = []
@@ -46,6 +48,11 @@ router.post('/cadastro', async (req, res) => {
     if (erros.length > 0) {
         res.render('clientes/cadastroclientes', { erros: erros, nome: nome, sobrenome: sobrenome, telefone: telefone, cpf: cpf, endereco: endereco, numero: numero, bairro: bairro, cidade: cidade, estado: estado, cep: cep, complemento: complemento, email: email })
     } else {
+        const token = req.session.token
+        const secret = process.env.Secret
+        const decodedToken = jwt.verify(token, secret)
+        const userId = decodedToken.id
+
         const cliente = await Cliente.create({
             nome: req.body.nome,
             sobrenome: req.body.sobrenome,
@@ -57,7 +64,8 @@ router.post('/cadastro', async (req, res) => {
             bairro: req.body.bairro,
             cidade: req.body.cidade,
             cep: req.body.cep,
-            uf: req.body.estado
+            uf: req.body.estado,
+            id_usuario: userId
         }).then(() => {
             req.flash('success_msg', 'Cliente cadastrada com sucesso!')
             res.redirect('/home')

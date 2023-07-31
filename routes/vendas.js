@@ -119,7 +119,6 @@ router.get('/nova/cliente/:id', async (req, res) => {
 
 })
 router.post('/novopedido', async (req, res) => {
-    const data = req.body
 
     const Clienteid = req.body.Clienteid
     const Pagamentoid = req.body.Pagamentoid
@@ -153,13 +152,13 @@ router.post('/novopedido', async (req, res) => {
     if (!VlrTotal || typeof VlrTotal == undefined || VlrTotal == null) {
         erros.push({ texto: "Erro no valor total" })
     }
-    if (Pagamentoid == 1) {
+    if (Pagamentoid == 1 || Pagamentoid == 2) {
         if (QntdParcela <= 0 || QntdParcela.length <= 0) {
             erros.push({ texto: "Erro na quantidade de parcela" })
         }
     }
 
-    if (Pagamentoid > 1) {
+    if (Pagamentoid > 2) {
         QntdParcela = 1
     }
 
