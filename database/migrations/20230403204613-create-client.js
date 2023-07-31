@@ -1,3 +1,4 @@
+const { INTEGER } = require('sequelize');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -55,6 +56,14 @@ module.exports = {
         uf:{
           type: Sequelize.STRING,
           allowNull: false
+        },
+        id_usuario:{
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          references:{
+              model: 'usuario',
+              key: "id"
+          }
         },
         created_at: {
           type: Sequelize.DATE,
