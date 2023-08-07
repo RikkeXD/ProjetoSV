@@ -85,8 +85,6 @@ router.get('/', async (req, res) => {
                 vlr_total: total_formatado
             })
         }
-
-        const NomePagamento = await BuscandoPagamento(1)
         res.render('vendas/vendas', { pedidos: TodosPedidos })
     } catch (err) {
         console.log(err)

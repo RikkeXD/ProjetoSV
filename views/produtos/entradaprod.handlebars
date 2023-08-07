@@ -1,0 +1,75 @@
+<h1>Entrada de Produtos</h1>
+{{#if entrada}}
+<a href="/produtos/entrada/cadastro"><button type="button" class="btn btn-primary mb-3">Cadastrar Entrada</button></a>
+<form action="/clientes/pesquisa" method="post">
+
+  <div class="input-group">
+    <input type="search" class="form-control rounded" placeholder="Pesquisar" aria-label="Search"
+      aria-describedby="search-addon" name="pesquisa" />
+    <button type="submit" class="btn btn-outline-primary">Pesquisar</button>
+  </div>
+</form>
+<hr>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Nº NOTA</th>
+      <th scope="col">FORNECEDOR</th>
+      <th scope="col">PRODUTO</th>
+      <th scope="col">QUANTIDADE</th>
+      <th scope="col">VALOR TOTAL</th>
+      <th scope="col">DATA</th>
+      <th scope="col" class="d-flex justify-content-center">AÇÕES</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each entrada}}
+    <tr>
+      <td>{{num_nota}}</th>
+      <td>{{fornecedor}}</td>
+      <td>{{produto}}</td>
+      <td>{{qntd_produto}}</td>
+      <td>{{vlr_total}}</td>
+      <td>{{data}}</td>
+      <td>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <a href="/produtos/entrada/edit/{{id}}"><button class="btn btn-warning btn-sm" type="button">Editar</button></a>
+          <button class="btn btn-danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#ModalExluir"
+            data-cliente="" data-id="{{id}}">Excluir</button>
+        </div>
+      </td>
+    </tr>
+
+    <!--   Modal  Excluir    -->
+    <div class="modal fade" id="ModalExluir" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmar Exclusão</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Deseje realmente exluir?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <form action="/produtos/entrada/deletar" method="post">
+              <button type="submit" class="btn btn-danger">Confirmar</button>
+              <input type="hidden" name="id" value="{{id}}">
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    {{else}}
+    {{/each}}
+  </tbody>
+</table>
+
+{{else}}
+<div class="text-bg-secondary p-3">
+  <h1 class="fs-5">Não existe Entradas cadastradas</h1>
+</div>
+{{/if}}

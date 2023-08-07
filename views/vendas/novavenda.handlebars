@@ -232,6 +232,7 @@
                                 <div class="g-col-4 input-group mb-3">
                                     <input type="text" class="form-control ms-1"
                                         aria-label="Text input with dropdown button" id="barra-pesquisa">
+
                                     <button class="btn btn-outline-secondary" type="button"
                                         id="btn-pesquisar">Pesquisar</button>
                                 </div>
@@ -301,6 +302,19 @@
                 src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
 
             <script>
+
+                /* Enviando a TAG de busca para o Back-End */
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById("btn-pesquisar").addEventListener('click', function () {
+                        console.log("Botão Pesquisa Clicado")
+                        var valorPesquisa = document.getElementById('barra-pesquisa').value
+                        fetch('/clientes/venda?pesquisa=' + valorPesquisa)
+                            .then(response => response.json())
+                            .then(data => {
+                                atualizarTabelaClientes(data)
+                            })
+                    })
+                })
 
                 //Fechando MODAL
                 function fecharModal() {
@@ -530,17 +544,7 @@
                     });
                 }
 
-                /* Enviando a TAG de busca para o Back-End */
-                document.addEventListener('DOMContentLoaded', function () {
-                    document.getElementById("btn-pesquisar").addEventListener('click', function () {
-                        var valorPesquisa = document.getElementById('barra-pesquisa').value
-                        fetch('/clientes/venda?pesquisa=' + valorPesquisa)
-                            .then(response => response.json())
-                            .then(data => {
-                                atualizarTabelaClientes(data)
-                            })
-                    })
-                })
+                
 
                 //Verificando os dados do produto
                 function VerificarCamposPreenchidos(produtos) {

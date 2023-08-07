@@ -12,6 +12,7 @@ const home = require('./routes/home')//Importando as Rotas do usuario
 const clientes = require('./routes/clientes') //Importando as Rotas do cliente
 const produtos = require('./routes/produtos')
 const vendas = require('./routes/vendas')
+const estoque = require("./routes/estoque")
 const moment = require('moment') //Biblioteca para ajuda na formatação das Datas
 const bcrypt = require('bcrypt')
 require('dotenv').config()
@@ -164,6 +165,7 @@ app.use('/home', checkToken,home)
 app.use('/clientes', checkToken,clientes)
 app.use('/produtos', checkToken,produtos)
 app.use('/vendas', checkToken ,vendas)
+app.use('/estoque', checkToken, estoque)
 
 app.use(checkToken);
 

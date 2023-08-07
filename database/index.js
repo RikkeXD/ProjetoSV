@@ -7,6 +7,7 @@ const Produto = require('../models/Produto')
 const Vendas = require('../models/Venda')
 const Pagamentos = require('../models/Pagamento')
 const Venda_Produto = require('../models/Venda_Produto')
+const Entrada_Produto = require('../models/Entrada_Produto')
 
 const connection = new Sequelize(configDB)
 
@@ -16,5 +17,6 @@ Produto.init(connection)
 Vendas.init(connection)
 Pagamentos.init(connection)
 Venda_Produto.init(connection)
+Entrada_Produto.init(connection)
 
 module.exports = connection

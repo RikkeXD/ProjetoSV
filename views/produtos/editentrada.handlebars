@@ -1,0 +1,149 @@
+{{#each erro}}
+<div class="alert alert-danger">{{texto}}</div>
+{{else}}
+{{/each}}
+
+
+<h1>Editar Entrada de Produto</h1>
+<div class="card">
+    <div class="card-body">
+        <form action="/produtos/entrada/cadastrar" method="post">
+            <div class="row g-3 align-items-center mt-3">
+                <div class="col-auto aling-items-center">
+                    <label for="produto">Produto:</label>
+                </div>
+                <div class="col-auto">
+                    <div class="form-group col-md-3">
+                        <select class="selectpicker" data-live-search="true" id="produto" name="produto">
+                            <!-- Opções da lista suspensa -->
+                            {{#each produto}}
+                            <option value="{{id}}">{{nome}}</option>
+                            {{else}}
+                            {{/each}}
+
+                        </select>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <span id="nome" class="form-text">
+                        Escolha o produto
+                    </span>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center mt-2">
+                <div class="col-auto">
+                    <label for="fornecedor" class="col-form-label">Fornecedor</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" name="fornecedor" class="form-control " aria-labelledby="fornecedor"
+                        value="{{nota.fornecedor}}" required>
+                </div>
+                <div class="col-auto">
+                    <span id="Fornecedor" class="form-text">
+                        Digite o fornecedor
+                    </span>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center mt-2">
+                <div class="col-auto">
+                    <label for="email" class="col-form-label">Nº Nota</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" id="n_nota" name="n_nota" class="form-control " aria-labelledby="n_nota"
+                        value="{{nota.n_nota}}">
+                </div>
+                <div class="col-auto">
+                    <span id="n_nota" class="form-text">
+                        Digite o numero da nota
+                    </span>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center mt-2">
+                <div class="col-auto">
+                    <label for="vlr_total" class="col-form-label">Valor Total</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" id="vlr_total" name="vlr_total" class="form-control" aria-labelledby="vlr_total"
+                        value="{{nota.vlr_total}}" data-value="{{nota.vlr_total}}" required>
+                </div>
+                <div class="col-auto">
+                    <span id="vlr_total_label" class="form-text">
+                        Digite o valor total dos produtos
+                    </span>
+                </div>
+            </div>
+            <div class="row g-3 align-items-center mt-2">
+                <div class="col-auto">
+                    <label for="qntd_produtos" class="col-form-label">Qntd Produtos</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" id="qntd_produtos" name="qntd_produtos" class="form-control"
+                        aria-labelledby="qntd_produtos" value="{{nota.qntd_produto}}" required>
+                </div>
+                <div class="col-auto">
+                    <span id="qntd_produtos" class="form-text">
+                        Digite a quantidade total do produtos
+                    </span>
+                </div>
+            </div>
+            <hr class="mt-5">
+            <button type="submit" class="btn btn-primary mt-3">EDITAR ENTRADA</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- IMPORTANDO BIBLIOTECAS -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const valorInput = document.getElementById("vlr_total").value;
+        const valorFormatado = parseFloat(valorInput.replace(',', '.'));
+
+        if (!isNaN(valorFormatado)) {
+            const valorEmReais = valorFormatado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById("vlr_total").value = valorEmReais;
+        } else {
+            document.getElementById("vlr_total").value = "Valor inválido";
+        }
+    });
+
+    //Produtos
+    document.addEventListener('DOMContentLoaded', () => {
+        const produtoId = '{{ nota.id }}'; // Valor retornado do banco de dados
+
+        // Função para selecionar a opção correta no Select
+        function selecionarProduto() {
+            const select = document.querySelector('select[name="produto"]');
+            const option = select.querySelector(`option[value="${produtoId}"]`);
+
+            if (option) {
+                option.selected = true;
+            }
+        }
+
+        // Executar a função após um pequeno intervalo para garantir que o DOM esteja pronto
+        setTimeout(selecionarProduto, 100);
+    });
+
+    const inputQntdProdutos = document.getElementById('qntd_produtos');
+    inputQntdProdutos.addEventListener('keydown', function (event) {
+        // Permitir caracteres especiais como backspace, delete, setas, etc.
+        if (![8, 9, 37, 39, 46].includes(event.keyCode)) {
+            // Verificar se a tecla pressionada é um número (0-9)
+            if (event.keyCode < 48 || event.keyCode > 57) {
+                event.preventDefault(); // Impedir a inserção da tecla inválida
+            }
+        }
+    });
+</script>
