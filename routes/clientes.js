@@ -71,6 +71,7 @@ router.post('/cadastro', async (req, res) => {
             res.redirect('/home')
         }).catch((err) => {
             req.flash('error_msg', 'Ocorreu um erro ao cadastrar o cliente')
+            console.log("Erro ao Cadastrar o Cliente >>> ", err)
             res.redirect('/home')
         })
     }
