@@ -52,6 +52,7 @@ router.post('/cadastro', async (req, res) => {
         const secret = process.env.Secret
         const decodedToken = jwt.verify(token, secret)
         const userId = decodedToken.id
+        console.log('ID DO USUARIO: >>> ', userId)
 
         const cliente = await Cliente.create({
             nome: req.body.nome,
