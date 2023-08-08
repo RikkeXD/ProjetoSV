@@ -14,7 +14,8 @@ class Cliente extends Model{
             bairro: DataTypes.STRING,
             cidade: DataTypes.STRING,
             complemento: DataTypes.STRING,
-            uf: DataTypes.STRING
+            uf: DataTypes.STRING,
+            id_usuario: DataTypes.INTEGER
         }, {
             sequelize
         })
