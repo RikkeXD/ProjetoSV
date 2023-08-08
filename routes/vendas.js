@@ -13,6 +13,7 @@ const path = require('path')
 const { checkToken } = require('../app')
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
+const { error } = require('console')
 
 async function BuscandoNomePorId(id) {
     try {
@@ -20,7 +21,7 @@ async function BuscandoNomePorId(id) {
         const nomeCliente = `${nome.nome} ${nome.sobrenome}`
         return nomeCliente
     } catch (err) {
-        console.log('ERRO NA FUNÇÃO Bus')
+        console.log('ERRO NA FUNÇÃO BuscandoNomePorId >>> ', err)
     }
 
 }
@@ -31,7 +32,7 @@ async function BuscandoPagamento(id) {
         const nomePagamento = pagamento.nome
         return nomePagamento
     } catch (err) {
-        console.log("ERRO NA FUNÇÃO BUSCANDOPAGAMENTO" + err)
+        console.log("ERRO NA FUNÇÃO BuscandoPagamento >>> ", err)
     }
 
 }
@@ -511,8 +512,8 @@ router.get('/:id/download', async (req, res) => {
         doc.y = novaPosicaoY;
 
         doc.text('Destinatário/Remetente', destinatarioX, novaPosicaoY - 12, { align: 'left' });
-        doc.text(`Pedido ${Infopedido.numpedido} /`, destinatarioX + 350, novaPosicaoY - 12, { align: 'left' });
-        doc.text(`Emissão ${Infopedido.data}`, destinatarioX + 400, novaPosicaoY - 12, { align: 'left' });
+        doc.text(`Pedido ${Infopedido.numpedido} /`, destinatarioX + 345, novaPosicaoY - 12, { align: 'left' });
+        doc.text(`Emissão ${Infopedido.data}`, destinatarioX + 395, novaPosicaoY - 12, { align: 'left' });
         createCellWithLabel('Nome:', `${cliente.nome} ${cliente.sobrenome}`, destinatarioX, nomeY, nomeWidth, nomeHeight);
         createCellWithLabel('Telefone:', `${cliente.telefone}`, destinatarioX + 200, nomeY, 130, nomeHeight);
         createCellWithLabel('CPF:', `${cliente.cpf}`, destinatarioX + 330, nomeY, 170, nomeHeight);
