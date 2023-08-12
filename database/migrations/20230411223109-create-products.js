@@ -12,14 +12,14 @@ module.exports = {
       },
       nome:{
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(30)
       },
       fornecedor:{
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(30)
       },
       cod_barras:{
-        type:Sequelize.STRING
+        type:Sequelize.STRING(40)
       },
       created_at:{
         type: Sequelize.DATE,

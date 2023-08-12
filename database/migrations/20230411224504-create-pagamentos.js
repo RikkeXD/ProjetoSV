@@ -11,7 +11,7 @@ module.exports = {
       },
       nome:{
         allowNull: false,
-        type:Sequelize.STRING
+        type:Sequelize.STRING(25)
       },
       qtd_parcela:{
         type: Sequelize.INTEGER

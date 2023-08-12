@@ -44,7 +44,7 @@ module.exports = {
       },
       frete: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(20)
       },
       vlr_frete: {
         allowNull: true,
@@ -56,7 +56,7 @@ module.exports = {
       },
       cod_rastreio:{
         allowNull: true,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(50)
       },
       created_at: {
         type: Sequelize.DATE,

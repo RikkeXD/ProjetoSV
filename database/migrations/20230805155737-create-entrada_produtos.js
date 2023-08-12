@@ -23,7 +23,7 @@ module.exports = {
       },
       num_nota:{
         allowNull:true,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(20)
       },
       vlr_total:{
         allowNull: false,
